@@ -63,6 +63,11 @@ public class UserController {
         return userLogic.getAllProductsByCategory(category_id);
     }
 
+    @GetMapping("/categories")
+    public List<CategoryModel> getCategories(){
+        return userLogic.getAllCategories();
+    }
+
     @GetMapping("/find")
     public UserModel showUserDetails(Principal principal){
         return userLogic.getUser(principal.getName());

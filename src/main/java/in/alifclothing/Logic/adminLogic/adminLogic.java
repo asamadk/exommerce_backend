@@ -26,7 +26,7 @@ public interface adminLogic {
 
      boolean deleteSizeFromProduct(Integer product_id, Integer sizeoption_id);
 
-     CategoryModel addCategory(CategoryModel categoryModel);
+     CategoryModel addCategory(String categoryModel, MultipartFile file);
 
      List<CategoryModel> getAllCategories();
 

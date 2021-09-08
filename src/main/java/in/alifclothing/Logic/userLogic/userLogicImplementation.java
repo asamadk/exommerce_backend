@@ -23,6 +23,8 @@ public class userLogicImplementation implements userLogic{
     private OrderRepository orderRepository;
     @Autowired
     private WishlistRepository wishlistRepository;
+    @Autowired
+    private CategoriesRepository categoriesRepository;
 
     @Override
     public ShoppingCartModel addProductToCart(Integer product_id, String email) {
@@ -259,6 +261,11 @@ public class userLogicImplementation implements userLogic{
             });
         });
         return wishlistModelOptional.isPresent();
+    }
+
+    @Override
+    public List<CategoryModel> getAllCategories() {
+        return categoriesRepository.findAll();
     }
 
 

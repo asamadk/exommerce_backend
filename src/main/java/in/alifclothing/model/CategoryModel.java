@@ -13,6 +13,7 @@ public class CategoryModel {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int category_Id;
     private String category_Name;
+    private String category_image;
     @JsonIgnore
    @OneToMany(cascade = CascadeType.ALL,mappedBy = "categoryModel")
     private List<ProductModel> productModel;
@@ -21,9 +22,10 @@ public class CategoryModel {
         this.category_Name = category_Name;
     }
 
-    public CategoryModel(String category_Name, List<ProductModel> productModel) {
+    public CategoryModel(String category_Name, List<ProductModel> productModel, String category_image) {
         this.category_Name = category_Name;
         this.productModel = productModel;
+        this.category_image = category_image;
     }
 
     public List<ProductModel> getProductModel() {
@@ -50,5 +52,13 @@ public class CategoryModel {
 
     public void setCategory_Name(String category_Name) {
         this.category_Name = category_Name;
+    }
+
+    public String getCategory_image() {
+        return category_image;
+    }
+
+    public void setCategory_image(String category_image) {
+        this.category_image = category_image;
     }
 }

@@ -178,8 +178,20 @@ public class adminLogicImplementation implements adminLogic{
     }
 
     @Override
-    public CategoryModel addCategory(CategoryModel categoryModel) {
-        return categoriesRepository.save(categoryModel);
+    public CategoryModel addCategory(String categoryModel, MultipartFile file) {
+
+        CategoryModel categoryModelJSON = new CategoryModel();
+        try{
+            ObjectMapper objectMapper = new ObjectMapper();
+            categoryModelJSON = objectMapper.readValue(categoryModel,CategoryModel.class);
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+        String filename = fileStorageService.storeFile(file);
+        String url = ServletUriComponentsBuilder.fromCurrentContextPath().path("/download/").path(filename).toUriString();
+        categoryModelJSON.setCategory_image(url);
+        categoriesRepository.save(categoryModelJSON);
+        return categoryModelJSON;
     }
 
     @Override
@@ -191,7 +203,15 @@ public class adminLogicImplementation implements adminLogic{
     public boolean deleteCategory(Integer cat_id) {
         boolean result = false;
         try {
-            categoriesRepository.deleteById(cat_id);
+            categoriesRepository.findById(cat_id).ifPresent(category ->{
+                int i = category.getCategory_image().length()-1;
+                while(i >= 0){
+                    if(category.getCategory_image().charAt(i) == '/')break;
+                    i--;
+                }
+                fileStorageService.deleteFile(category.getCategory_image().substring(i+1));
+                categoriesRepository.delete(category);
+            });
             result = true;
         }catch (NoSuchElementException exception){
             exception.printStackTrace();

@@ -4,6 +4,7 @@ import in.alifclothing.model.CategoryModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -14,9 +15,9 @@ public class CategoryController {
     @Autowired
     private in.alifclothing.Logic.adminLogic.adminLogic adminLogic;
 
-    @PostMapping("/addcategory")
-    public CategoryModel addcategory(@RequestBody CategoryModel categoryModel){
-        return adminLogic.addCategory(categoryModel);
+    @PostMapping("/category")
+    public CategoryModel addcategory(@RequestPart("category") String categoryModel, @RequestPart("category_image") MultipartFile file){
+        return adminLogic.addCategory(categoryModel,file);
     }
 
     @GetMapping("/categories")

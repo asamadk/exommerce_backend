@@ -40,4 +40,6 @@ public interface userLogic {
     WishlistModel getUserWishlist(String email);
 
     boolean deleteProductFromWishlist(Integer product_id,Integer wishlist_id);
+
+    List<CategoryModel> getAllCategories();
 }

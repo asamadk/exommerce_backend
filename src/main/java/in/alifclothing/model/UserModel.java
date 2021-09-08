@@ -26,6 +26,7 @@ public class UserModel {
     private String user_country;
     private String user_address1;
     private String user_address2;
+    private String resetPasswordToken;
     private boolean user_block;
     @JsonIgnore
     @OneToOne(mappedBy = "userModel")
@@ -43,7 +44,7 @@ public class UserModel {
                      String Role, String user_City, String user_State, int user_zip, boolean user_email_verified,
                      Date user_registration_Date, int user_verification_code, String user_phone_number, String user_country,
                      String user_address1, String user_address2, ShoppingCartModel shoppingCartModel,
-                     List<OrderModel> orderModels,WishlistModel wishlistModel,boolean user_block) {
+                     List<OrderModel> orderModels,WishlistModel wishlistModel,boolean user_block,String resetPasswordToken) {
         this.user_Fname = user_Fname;
         this.user_Lname = user_Lname;
         this.email = email;
@@ -63,6 +64,7 @@ public class UserModel {
         this.orderModels = orderModels;
         this.wishlistModel = wishlistModel;
         this.user_block = user_block;
+        this.resetPasswordToken = resetPasswordToken;
     }
 
     //Getters and setters
@@ -226,5 +228,13 @@ public class UserModel {
 
     public void setUser_block(boolean user_block) {
         this.user_block = user_block;
+    }
+
+    public String getResetPasswordToken() {
+        return resetPasswordToken;
+    }
+
+    public void setResetPasswordToken(String resetPasswordToken) {
+        this.resetPasswordToken = resetPasswordToken;
     }
 }
