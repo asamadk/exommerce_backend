@@ -232,7 +232,7 @@ public class userLogicImplementation implements userLogic{
                 wishlist.getProductModelList().add(product);
                 wishlistRepository.save(wishlist);
             });
-            if(wishlistModelOptional.isEmpty()){
+            if(wishlistModelOptional == null){
                 WishlistModel wishlist = new WishlistModel();
                 wishlist.setUserModel(user);
                 List<ProductModel> productModelList = new ArrayList<>();

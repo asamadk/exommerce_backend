@@ -92,10 +92,14 @@ public class superuserLogicImplementation implements superuserLogic{
     @Override
     public boolean blockandunblockUser(Integer uid) {
         Optional<UserModel> userModelOptional = userRepository.findById(uid);
-        List<UserModel> userModelList = userModelOptional.stream().collect(Collectors.toList());
-        UserModel user = userModelList.get(0);
-        user.setUser_block(!user.isUser_block());
-        userRepository.save(user);
-        return userModelOptional.isPresent();
+        UserModel user = null;
+        if(userModelOptional.isPresent()) {
+             user = userModelOptional.get();
+            user.setUser_block(!user.isUser_block());
+            userRepository.save(user);
+            return true;
+        }
+
+        return false;
     }
 }
