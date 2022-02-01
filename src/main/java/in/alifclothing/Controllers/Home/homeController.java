@@ -39,6 +39,11 @@ public class homeController {
         this.fileStorageService = fileStorageService;
     }
 
+    @GetMapping("/test")
+    public String testing(){
+        return "Sucesfull";
+    }
+
     @PostMapping("/register")
     public UserModel addUser(@RequestBody UserModel user){
         return homeLogic.persistUser(user);
