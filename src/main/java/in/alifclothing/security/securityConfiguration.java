@@ -43,10 +43,6 @@ public class securityConfiguration extends WebSecurityConfigurerAdapter {
         auth.authenticationProvider(daoAuthenticationProvider());
     }
 
-
-
-
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -60,6 +56,7 @@ public class securityConfiguration extends WebSecurityConfigurerAdapter {
                 .authorizeRequests().
                 antMatchers("/superuser/**").hasRole("SUPERUSER").
                 antMatchers("/admin/**").hasRole("ADMIN").
+//        antMatchers("/admin/**").permitAll().
                 antMatchers("/user/**").hasRole("USER").
                 antMatchers("/**").permitAll();
     }

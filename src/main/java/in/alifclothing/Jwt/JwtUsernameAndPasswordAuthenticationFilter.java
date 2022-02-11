@@ -1,6 +1,9 @@
 package in.alifclothing.Jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import in.alifclothing.Dto.Response;
+import in.alifclothing.Helper.Contants;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,7 +17,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 
 //client sends the credentials
@@ -62,5 +69,17 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
                 .compact();
 
         response.addHeader("Authorization","Bearer " + token);
+        Response<String> tokenResponse = new Response<>();
+        tokenResponse.setResponseCode(Contants.OK_200);
+        tokenResponse.setResponseWrapper(new ArrayList<>(Collections.singletonList(token)));
+        tokenResponse.setResponseDesc(Contants.SUCCESS);
+
+        String json = new Gson().toJson(tokenResponse);
+
+        PrintWriter out = response.getWriter();
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        out.write(json);
+        out.flush();
     }
 }

@@ -1,5 +1,7 @@
 package in.alifclothing.Logic.adminLogic;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import in.alifclothing.Dto.Response;
 import in.alifclothing.model.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -8,61 +10,59 @@ import java.util.Optional;
 
 public interface adminLogic {
 
-     List<ProductModel> getAllProducts();
+     Response<ProductModel> getAllProducts();
 
-     Optional<ProductModel> getSingleProduct(Integer pid);
+     Response<ProductModel> getSingleProduct(Integer pid);
 
-     Optional<ProductModel> updateProduct(ProductModel productModel,Integer pid);
+     Response<ProductModel> updateProduct(ProductModel productModel,Integer pid);
 
-     ProductModel getproductJSON(String ProductModel,MultipartFile[] files,String catid);
+     Response<ProductModel> getproductJSON(String ProductModel,MultipartFile[] files,String catid) throws JsonProcessingException;
 
-     boolean deleteproduct(Integer pid);
+     Response<String> deleteproduct(Integer pid);
 
-     OptionModel addSize(OptionModel optionModel);
+     Response<OptionModel> addSize(OptionModel optionModel);
 
-     List<OptionModel> getAllSizes();
+     Response<OptionModel> getAllSizes();
 
-     boolean addSizeToProduct(Integer product_id, Integer sizeoption_id);
+     Response<String> addSizeToProduct(Integer product_id, Integer sizeoption_id);
 
-     boolean deleteSizeFromProduct(Integer product_id, Integer sizeoption_id);
+     Response<String> deleteSizeFromProduct(Integer product_id, Integer sizeoption_id);
 
-     CategoryModel addCategory(String categoryModel, MultipartFile file);
+     Response<CategoryModel> addCategory(String categoryModel, MultipartFile file);
 
-     List<CategoryModel> getAllCategories();
+     Response<String> deleteCategory(Integer cat_id);
 
-     boolean deleteCategory(Integer cat_id);
+     Response<UserModel> getUsers();
 
-     List<UserModel> getUsers();
+     Response<CouponsModel> addCoupon(CouponsModel couponsModel);
 
-     CouponsModel addCoupon(CouponsModel couponsModel);
+    Response<CouponsModel> getAllCoupons();
 
-    List<CouponsModel> getAllCoupons();
+     Response<CouponsModel> getCoupon(Integer cid);
 
-     Optional<CouponsModel> getCoupon(Integer cid);
+     Response<String> deleteCoupon(Integer cid);
 
-     boolean deleteCoupon(Integer cid);
+     Response<String> addBanner(MultipartFile[] files,MultipartFile file1,MultipartFile file2,MultipartFile file3);
 
-     boolean addBanner(MultipartFile[] files,MultipartFile file1,MultipartFile file2,MultipartFile file3);
+     Response<BannerModel> getBanners();
 
-     List<BannerModel> getBanners();
+     Response<String> deleteAllBanners();
 
-     boolean deleteAllBanners();
+     Response<String> createOrderStatus(OrderStatus orderStatus);
 
-     boolean createOrderStatus(OrderStatus orderStatus);
+     Response<OrderStatus> findAllOrderStatus();
 
-     List<OrderStatus> findAllOrderStatus();
+     Response<String> deleteOrderStatusById(Integer order_status_id);
 
-     boolean deleteOrderStatusById(Integer order_status_id);
+     Response<ShoppingCartModel> getUsersCartByUserId(Integer user_id);
 
-     ShoppingCartModel getUsersCartByUserId(Integer user_id);
+     Response<OrderModel> getUsersOrdersByUserId(String email);
 
-     List<OrderModel> getUsersOrdersByUserId(Integer user_id);
+     Response<String> deleteUsersOrderByOrderId(Integer order_id);
 
-     boolean deleteUsersOrderByOrderId(Integer order_id);
+     Response<String> updateOrdersStatusOfOneOrder(Integer order_id, Integer orderstatus_id);
 
-     boolean updateOrdersStatusOfOneOrder(Integer order_id, Integer orderstatus_id);
+     Response<OrderModel> getAllOrdersofAllUsers();
 
-     List<OrderModel> getAllOrdersofAllUsers();
-
-     OrderModel getSingleOrderByOrderId(Integer order_id);
+     Response<OrderModel> getSingleOrderByOrderId(Integer order_id);
 }

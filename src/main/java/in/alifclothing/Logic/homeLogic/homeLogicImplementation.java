@@ -1,23 +1,22 @@
 package in.alifclothing.Logic.homeLogic;
 
-import in.alifclothing.Logic.homeLogic.homeLogic;
+import in.alifclothing.Dto.Response;
 import in.alifclothing.PersistanceRepository.UserRepository;
 import in.alifclothing.model.UserModel;
 import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMailMessage;
+
+import in.alifclothing.Helper.Contants;
+
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-import javax.swing.text.html.Option;
 import java.io.UnsupportedEncodingException;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 
 @Service
@@ -31,12 +30,19 @@ public class homeLogicImplementation implements homeLogic {
     private JavaMailSender javaMailSender;
 
     @Override
-    public UserModel persistUser(UserModel userModel) {
+    public Response<?> persistUser(UserModel userModel) {
         Optional<UserModel> checkforEmailPresence = Optional.ofNullable(userRepository.findByEmail(userModel.getEmail()));
 
-        if(checkforEmailPresence.isPresent())
-            return null;
-        else {
+        Response<UserModel> response = new Response<>();
+        HashMap<String,String> errorMap = new HashMap<>();
+
+        if(checkforEmailPresence.isPresent()) {
+            errorMap.put(Contants.ERROR, "Email Already present");
+            response.setErrorMap(errorMap);
+            response.setResponseCode(Contants.CLIENT_400);
+            response.setResponseDesc(Contants.FALIURE);
+            return response;
+        }else {
             if(Objects.equals(userModel.getEmail(), "superusersamad")) {
                 userModel.setRole("ROLE_SUPERUSER");
                 userModel.setUser_Password(bCryptPasswordEncoder.encode(userModel.getUser_Password()));
@@ -46,9 +52,14 @@ public class homeLogicImplementation implements homeLogic {
                 userModel.setUser_Password(bCryptPasswordEncoder.encode(userModel.getUser_Password()));
                 userModel.setUser_block(false);
             }
+            List<UserModel> userModelList = new ArrayList<>();
+            userModelList.add(userModel);
+            response.setResponseWrapper(userModelList);
+            response.setResponseDesc(Contants.SUCCESS);
+            response.setResponseCode(Contants.OK_200);
             userRepository.save(userModel);
         }
-        return userModel;
+        return response;
     }
 
     @Override
@@ -57,14 +68,23 @@ public class homeLogicImplementation implements homeLogic {
     }
 
     @Override
-    public void updateResetPassword(String token, String email) throws NotFoundException {
+    public Response<?> updateResetPassword(String token, String email) {
+        Map<String,String> errorMap = new HashMap<>();
+        Response<String> response = new Response<>();
         UserModel userModel = userRepository.findByEmail(email);
         if(userModel != null){
+            response.setResponseWrapper(new ArrayList(Arrays.asList("Email has been sent to your account")));
+            response.setResponseCode(Contants.OK_200);
+            response.setResponseDesc(Contants.SUCCESS);
             userModel.setResetPasswordToken(token);
             userRepository.save(userModel);
         }else{
-            throw new NotFoundException("Not able to find the email address");
+            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            response.setResponseDesc(Contants.FALIURE);
+            errorMap.put(Contants.ERROR,"Not able to find the email address");
+            response.setErrorMap(errorMap);
         }
+        return response;
     }
 
     @Override

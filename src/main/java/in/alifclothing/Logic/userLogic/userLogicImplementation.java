@@ -1,7 +1,10 @@
 package in.alifclothing.Logic.userLogic;
 
+import in.alifclothing.Dto.Response;
+import in.alifclothing.Helper.Contants;
 import in.alifclothing.PersistanceRepository.*;
 import in.alifclothing.model.*;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,12 +30,22 @@ public class userLogicImplementation implements userLogic{
     private CategoriesRepository categoriesRepository;
 
     @Override
-    public ShoppingCartModel addProductToCart(Integer product_id, String email) {
+    public Response<ShoppingCartModel> addProductToCart(Integer product_id, String email) {
+
+        Response<ShoppingCartModel> response = new Response<>();
+        Map<String,String> errorMap = new HashMap<>();
 
         UserModel user = userRepository.findByEmail(email);
+        if(user == null){
+            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            errorMap.put(Contants.ERROR,"No user found");
+            response.setErrorMap(errorMap);
+            response.setResponseDesc(Contants.FALIURE);
+            return response;
+        }
         Optional<ProductModel> product = productRepository.findById(product_id);
         ProductModel productModel;
-        ShoppingCartModel shoppingCartModel;
+        ShoppingCartModel shoppingCartModel = null;
         long time = System.currentTimeMillis();
         if(product.isPresent()) {
             productModel = product.get();
@@ -49,7 +62,6 @@ public class userLogicImplementation implements userLogic{
                 shoppingCartModel.setTotal(total);
                 shoppingCartRepository.save(shoppingCartModel);
                 shoppingCartModel.setShoppingCartDate(new java.sql.Date(time));
-                return shoppingCartModel;
             }else{
                 shoppingCartModel = new ShoppingCartModel();
                 shoppingCartModel.setUserModel(user);
@@ -60,24 +72,61 @@ public class userLogicImplementation implements userLogic{
                 shoppingCartModel.setTotal(productModel.getProduct_price());
                 shoppingCartModel.setShoppingCartDate(new java.sql.Date(time));
                 shoppingCartRepository.save(shoppingCartModel);
-                return shoppingCartModel;
+
             }
+            List<ShoppingCartModel> shoppingCartModels = new ArrayList<>();
+            shoppingCartModels.add(shoppingCartModel);
+            response.setResponseWrapper(shoppingCartModels);
+            response.setResponseDesc(Contants.SUCCESS);
+            response.setResponseCode(Contants.OK_200);
+        }else{
+            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            errorMap.put(Contants.ERROR,"No product found");
+            response.setErrorMap(errorMap);
+            response.setResponseDesc(Contants.FALIURE);
+            return response;
         }
 
-        return new ShoppingCartModel();
+        return response;
     }
 
     @Override
-    public ShoppingCartModel getUserCart(String email) {
+    public Response<ShoppingCartModel> getUserCart(String email) {
+
+        Response<ShoppingCartModel> response = new Response<>();
+        Map<String,String> errorMap = new HashMap<>();
+
         UserModel user = userRepository.findByEmail(email);
+        if(user == null){
+            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            errorMap.put(Contants.ERROR,"No user found");
+            response.setErrorMap(errorMap);
+            response.setResponseDesc(Contants.FALIURE);
+            return response;
+        }
         Optional<ShoppingCartModel> shoppingCartModel = shoppingCartRepository.findByUserId(user.getUser_id());
         ShoppingCartModel shoppingCartModel1 ;
-        return shoppingCartModel.orElse(null);
+        if(shoppingCartModel.isPresent()){
+            List<ShoppingCartModel> shoppingCartModels = new ArrayList<>();
+            shoppingCartModels.add(shoppingCartModel.get());
+            response.setResponseWrapper(shoppingCartModels);
+            response.setResponseDesc(Contants.SUCCESS);
+            response.setResponseCode(Contants.OK_200);
+        }else{
+            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            errorMap.put(Contants.ERROR,"No cart found");
+            response.setErrorMap(errorMap);
+            response.setResponseDesc(Contants.FALIURE);
+        }
+        return response;
     }
 
     @Override
-    public AtomicBoolean deleteProductFromCart(Integer product_id, Integer cart_id) {
-        AtomicBoolean flag = new AtomicBoolean(false);
+    public Response<String> deleteProductFromCart(Integer product_id, Integer cart_id) {
+
+        Response<String> response = new Response<>();
+        Map<String,String> errorMap = new HashMap<>();
+
         Optional<ShoppingCartModel> shoppingcartoptional = shoppingCartRepository.findById(cart_id);
         shoppingcartoptional.ifPresent(shoppingCartModel -> {
             productRepository.findById(product_id).ifPresent(productModel -> {
@@ -88,14 +137,27 @@ public class userLogicImplementation implements userLogic{
                 shoppingCartModel.setTotal(0F);
                 if(shoppingCartModel.getProductModelList().isEmpty())shoppingCartModel.setTotalAmountBeforeDiscount(0F);
                 shoppingCartRepository.save(shoppingCartModel);
-                flag.set(true);
+                response.setResponseWrapper(Arrays.asList("Product Deleted"));
+                response.setResponseDesc(Contants.SUCCESS);
+                response.setResponseCode(Contants.OK_200);
             });
         });
-        return flag;
+        if(!shoppingcartoptional.isPresent()){
+            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            errorMap.put(Contants.ERROR,"No product in cart");
+            response.setErrorMap(errorMap);
+            response.setResponseDesc(Contants.FALIURE);
+        }
+
+        return response;
     }
 
     @Override
-    public boolean addCouponToCart(CouponsModel couponsModel, Integer cartId) {
+    public Response<String> addCouponToCart(CouponsModel couponsModel, Integer cartId) {
+
+        Response<String> response = new Response<>();
+        Map<String,String> errorMap = new HashMap<>();
+
         Optional<ShoppingCartModel> shoppingCartModel = shoppingCartRepository.findById(cartId);
         Optional<CouponsModel> couponName = Optional.ofNullable(couponRepository.findByCouponName(couponsModel.getCouponName()));
         shoppingCartModel.ifPresent(cart -> {
@@ -115,38 +177,103 @@ public class userLogicImplementation implements userLogic{
                     cart.setTotal(total);
                     cart.setTotalAmountBeforeDiscount(totalbeforediscount);
 
+                    response.setResponseWrapper(Arrays.asList("Coupon added successfully"));
+                    response.setResponseDesc(Contants.SUCCESS);
+                    response.setResponseCode(Contants.OK_200);
                     shoppingCartRepository.save(cart);
                 });
             }
         });
-        return shoppingCartModel.isPresent()&&couponName.isPresent();
+
+        if(!shoppingCartModel.isPresent()){
+            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            errorMap.put(Contants.ERROR,"No cart found");
+            response.setErrorMap(errorMap);
+            response.setResponseDesc(Contants.FALIURE);
+        }
+
+        if(!couponName.isPresent()){
+            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            errorMap.put(Contants.ERROR,"No coupon found");
+            response.setErrorMap(errorMap);
+            response.setResponseDesc(Contants.FALIURE);
+        }
+        return response;
     }
 
     @Override
-    public List<CouponsModel> getAllCoupons() {
-        return couponRepository.findAll();
+    public Response<CouponsModel> getAllCoupons() {
+        List<CouponsModel> couponsModelList = couponRepository.findAll();
+        Response<CouponsModel> response = new Response<CouponsModel>();
+        Map<String,String> errorMap = new HashMap<>();
+        if(couponsModelList == null){
+            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            errorMap.put(Contants.ERROR,"No product found");
+            response.setErrorMap(errorMap);
+            response.setResponseDesc(Contants.FALIURE);
+            return response;
+        }
+        response.setResponseWrapper(couponsModelList);
+        response.setResponseDesc(Contants.SUCCESS);
+        response.setResponseCode(Contants.OK_200);
+        return response;
     }
 
     @Override
-    public boolean deleteCouponFromCart(Integer cartId) {
-        //total amount is same as amount befoee discount
+    public Response<String > deleteCouponFromCart(Integer cartId) {
+        //total amount is same as amount before discount
+
+        Response<String> response = new Response<>();
+        Map<String,String> errorMap = new HashMap<>();
+
         Optional<ShoppingCartModel> cartById = shoppingCartRepository.findById(cartId);
         cartById.ifPresent(cart -> {
             cart.setTotal(cart.getTotalAmountBeforeDiscount());
             cart.setCouponsModel(null);
             cart.setCouponUsed(false);
             shoppingCartRepository.save(cart);
+            response.setResponseWrapper(Arrays.asList("Deleted Successfully"));
+            response.setResponseDesc(Contants.SUCCESS);
+            response.setResponseCode(Contants.OK_200);
         });
-        return cartById.isPresent();
+
+        if(!cartById.isPresent()){
+            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            errorMap.put(Contants.ERROR,"No cart found");
+            response.setErrorMap(errorMap);
+            response.setResponseDesc(Contants.FALIURE);
+        }
+        return response;
     }
 
     @Override
-    public UserModel getUser(String email) {
-        return userRepository.findByEmail(email);
+    public Response<UserModel> getUser(String email) {
+
+        Response<UserModel> response = new Response<>();
+        Map<String,String> errorMap = new HashMap<>();
+        List<UserModel> userModelList = new ArrayList<>();
+        UserModel user =  userRepository.findByEmail(email);
+        if(user == null){
+            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            errorMap.put(Contants.ERROR,"No user found");
+            response.setErrorMap(errorMap);
+            response.setResponseDesc(Contants.FALIURE);
+        }else{
+            userModelList.add(user);
+            response.setResponseWrapper(userModelList);
+            response.setResponseDesc(Contants.SUCCESS);
+            response.setResponseCode(Contants.OK_200);
+        }
+        return response;
     }
 
     @Override
-    public boolean updateCurrentUser(UserModel userModel,Integer uid) {
+    public Response<UserModel> updateCurrentUser(UserModel userModel,Integer uid) {
+
+        Response<UserModel> response = new Response<>();
+        Map<String,String> errorMap = new HashMap<>();
+        List<UserModel> userModelList = new ArrayList<>();
+
         Optional<UserModel> checkUser = userRepository.findById(uid);
         checkUser.ifPresent(user -> {
             try {
@@ -161,18 +288,43 @@ public class userLogicImplementation implements userLogic{
                     userModel.setOrderModels(user.getOrderModels());
                     userModel.setWishlistModel(user.getWishlistModel());
                     userRepository.save(userModel);
+                    userModelList.add(userModel);
+                    response.setResponseWrapper(userModelList);
+                    response.setResponseDesc(Contants.SUCCESS);
+                    response.setResponseCode(Contants.OK_200);
                 }
+                response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+                errorMap.put(Contants.ERROR,"Email do not match");
+                response.setErrorMap(errorMap);
+                response.setResponseDesc(Contants.FALIURE);
             }catch (Exception exception){
                 exception.printStackTrace();
             }
 
         });
-        return userModel.getUser_id() == uid;
+
+        if(!checkUser.isPresent()){
+            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            errorMap.put(Contants.ERROR,"No user found");
+            response.setErrorMap(errorMap);
+            response.setResponseDesc(Contants.FALIURE);
+        }
+        return response;
     }
 
     @Override
-    public boolean createOrderFromCart(String email) {
+    public Response<String> createOrderFromCart(String email) {
+
+        Response<String> response = new Response<>();
+        Map<String,String> errorMap = new HashMap<>();
         UserModel user = userRepository.findByEmail(email);
+
+        if(user == null){
+            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            errorMap.put(Contants.ERROR,"No user found");
+            response.setErrorMap(errorMap);
+            response.setResponseDesc(Contants.FALIURE);
+        }
         Optional<ShoppingCartModel> shoppingCartModel = shoppingCartRepository.findByUserId(user.getUser_id());
         long time = System.currentTimeMillis();
         boolean flag =  shoppingCartModel.isPresent();
@@ -189,41 +341,137 @@ public class userLogicImplementation implements userLogic{
             order.setRazorpay_order_id(cart.getRazorpay_order_id());
             orderRepository.save(order);
             shoppingCartRepository.deleteById(cart.getShoppingCartId());
+            response.setResponseWrapper(Arrays.asList("Order Created"));
+            response.setResponseDesc(Contants.SUCCESS);
+            response.setResponseCode(Contants.OK_200);
             //TODO tracking number and order status
         });
-        return flag;
+
+        if(!shoppingCartModel.isPresent()){
+            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            errorMap.put(Contants.ERROR,"Shopping cart is empty");
+            response.setErrorMap(errorMap);
+            response.setResponseDesc(Contants.FALIURE);
+        }
+        return response;
     }
 
     @Override
-    public List<OrderModel> getAllOrdersOfUser(String email) {
-        UserModel user = userRepository.findByEmail(email);
-        return orderRepository.findByUserId(user.getUser_id());
-    }
+    public Response<OrderModel> getAllOrdersOfUser(String email) {
 
-    @Override
-    public OrderModel getSingleOrderOfUser(Integer order_id) {
-        return orderRepository.findById(order_id).orElse(null);
-    }
-
-    @Override
-    public List<ProductModel> getAllProducts() {
-        return productRepository.findAll();
-    }
-
-    @Override
-    public ProductModel getSingleProduct(Integer product_id) {
-        return productRepository.findById(product_id).orElse(null);
-    }
-
-    @Override
-    public List<ProductModel> getAllProductsByCategory(Integer category_id) {
-        return productRepository.findByCategoryId(category_id);
-    }
-
-    @Override
-    public boolean addProductToWishlist(Integer product_id, String email) {
+        Response<OrderModel> response = new Response<>();
+        Map<String,String> errorMap = new HashMap<>();
 
         UserModel user = userRepository.findByEmail(email);
+        if(user == null){
+            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            errorMap.put(Contants.ERROR,"No user found");
+            response.setErrorMap(errorMap);
+            response.setResponseDesc(Contants.FALIURE);
+        }
+        List<OrderModel> orderModelList =  orderRepository.findByUserId(user.getUser_id());
+        if(orderModelList != null){
+            response.setResponseWrapper(orderModelList);
+            response.setResponseDesc(Contants.SUCCESS);
+            response.setResponseCode(Contants.OK_200);
+        }
+        return response;
+    }
+
+    @Override
+    public Response<OrderModel> getSingleOrderOfUser(Integer order_id) {
+
+        Response<OrderModel> response = new Response<>();
+        Map<String,String> errorMap = new HashMap<>();
+        List<OrderModel> orderModelList = new ArrayList<>();
+
+        OrderModel order =  orderRepository.findById(order_id).orElse(null);
+        if(order != null){
+            orderModelList.add(order);
+            response.setResponseWrapper(orderModelList);
+            response.setResponseDesc(Contants.SUCCESS);
+            response.setResponseCode(Contants.OK_200);
+        }else{
+            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            errorMap.put(Contants.ERROR,"No order found");
+            response.setErrorMap(errorMap);
+            response.setResponseDesc(Contants.FALIURE);
+        }
+        return response;
+    }
+
+    @Override
+    public Response<ProductModel> getAllProducts() {
+        List<ProductModel> productModelList =  productRepository.findAll();
+        Response<ProductModel> response = new Response<ProductModel>();
+        Map<String,String> errorMap = new HashMap<>();
+
+        if(productModelList == null){
+            errorMap.put(Contants.ERROR,"No products found");
+            response.setErrorMap(errorMap);
+            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            response.setResponseDesc(Contants.FALIURE);
+            return response;
+        }
+
+        response.setResponseWrapper(productModelList);
+        response.setResponseDesc(Contants.SUCCESS);
+        response.setResponseCode(Contants.OK_200);
+        return response;
+    }
+
+    @Override
+    public Response<ProductModel> getSingleProduct(Integer product_id) {
+        Response<ProductModel> response = new Response<ProductModel>();
+        Map<String,String> errorMap = new HashMap<>();
+        List<ProductModel> productModelList = new ArrayList<>();
+        ProductModel product = productRepository.findById(product_id).orElse(null);
+        if(product == null){
+            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            errorMap.put(Contants.ERROR,"No product found");
+            response.setErrorMap(errorMap);
+            response.setResponseDesc(Contants.FALIURE);
+            return response;
+        }
+        productModelList.add(product);
+        response.setResponseWrapper(productModelList);
+        response.setResponseDesc(Contants.SUCCESS);
+        response.setResponseCode(Contants.OK_200);
+        return response;
+    }
+
+    @Override
+    public Response<ProductModel> getAllProductsByCategory(Integer category_id) {
+        Response<ProductModel> response = new Response<ProductModel>();
+        Map<String,String> errorMap = new HashMap<>();
+        List<ProductModel> productModelList = productRepository.findByCategoryId(category_id);
+        if(productModelList == null){
+            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            errorMap.put(Contants.ERROR,"No product found");
+            response.setErrorMap(errorMap);
+            response.setResponseDesc(Contants.FALIURE);
+            return response;
+        }
+        response.setResponseWrapper(productModelList);
+        response.setResponseDesc(Contants.SUCCESS);
+        response.setResponseCode(Contants.OK_200);
+        return response;
+    }
+
+    @Override
+    public Response<String> addProductToWishlist(Integer product_id, String email) {
+
+        Response<String> response = new Response<>();
+        Map<String,String> errorMap = new HashMap<>();
+
+        UserModel user = userRepository.findByEmail(email);
+        if(user == null){
+            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            errorMap.put(Contants.ERROR,"No user found");
+            response.setErrorMap(errorMap);
+            response.setResponseDesc(Contants.FALIURE);
+            return response;
+        }
         Optional<ProductModel> productModelOptional = productRepository.findById(product_id);
         productModelOptional.ifPresent(product -> {
             Optional<WishlistModel> wishlistModelOptional = wishlistRepository.findByUserId(user.getUser_id());
@@ -231,41 +479,101 @@ public class userLogicImplementation implements userLogic{
                 wishlist.setUserModel(user);
                 wishlist.getProductModelList().add(product);
                 wishlistRepository.save(wishlist);
+                response.setResponseWrapper(Arrays.asList("Product Added"));
             });
-            if(wishlistModelOptional == null){
+            if(!wishlistModelOptional.isPresent()){
                 WishlistModel wishlist = new WishlistModel();
                 wishlist.setUserModel(user);
                 List<ProductModel> productModelList = new ArrayList<>();
                 productModelList.add(product);
                 wishlist.setProductModelList(productModelList);
                 wishlistRepository.save(wishlist);
+                response.setResponseWrapper(Arrays.asList("Wishlist Created"));
             }
+            response.setResponseDesc(Contants.SUCCESS);
+            response.setResponseCode(Contants.OK_200);
         });
-
-        return productModelOptional.isPresent();
+        if(!productModelOptional.isPresent()){
+            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            errorMap.put(Contants.ERROR,"No product found");
+            response.setErrorMap(errorMap);
+            response.setResponseDesc(Contants.FALIURE);
+        }
+        return response;
     }
 
     @Override
-    public WishlistModel getUserWishlist(String email) {
+    public Response<WishlistModel> getUserWishlist(String email) {
+
+        Response<WishlistModel> response = new Response<>();
+        Map<String,String> errorMap = new HashMap<>();
         UserModel user = userRepository.findByEmail(email);
-        return wishlistRepository.findByUserId(user.getUser_id()).orElse(null);
+        if(user == null){
+            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            errorMap.put(Contants.ERROR,"No user found");
+            response.setErrorMap(errorMap);
+            response.setResponseDesc(Contants.FALIURE);
+            return response;
+        }
+
+        List<WishlistModel> wishlistModelList = new ArrayList<>();
+        Optional<WishlistModel> wishList = wishlistRepository.findByUserId(user.getUser_id());
+        if(wishList.isPresent()){
+            wishlistModelList.add(wishList.get());
+            response.setResponseWrapper(wishlistModelList);
+            response.setResponseDesc(Contants.SUCCESS);
+            response.setResponseCode(Contants.OK_200);
+        }else{
+            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            errorMap.put(Contants.ERROR,"No wishlist found");
+            response.setErrorMap(errorMap);
+            response.setResponseDesc(Contants.FALIURE);
+        }
+        return response;
     }
 
     @Override
-    public boolean deleteProductFromWishlist(Integer product_id, Integer wishlist_id) {
+    public Response<String> deleteProductFromWishlist(Integer product_id, Integer wishlist_id) {
+
+        Response<String> response = new Response<>();
+        Map<String,String> errorMap = new HashMap<>();
+
         Optional<WishlistModel> wishlistModelOptional = wishlistRepository.findById(wishlist_id);
         wishlistModelOptional.ifPresent(wishlist -> {
             productRepository.findById(product_id).ifPresent(product -> {
                 wishlist.getProductModelList().remove(product);
                 wishlistRepository.save(wishlist);
+                response.setResponseWrapper(Arrays.asList("Product Deleted"));
+                response.setResponseDesc(Contants.SUCCESS);
+                response.setResponseCode(Contants.OK_200);
             });
         });
-        return wishlistModelOptional.isPresent();
+
+        if(!wishlistModelOptional.isPresent()){
+            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            errorMap.put(Contants.ERROR,"No product found in wishlist");
+            response.setErrorMap(errorMap);
+            response.setResponseDesc(Contants.FALIURE);
+        }
+        return response;
     }
 
     @Override
-    public List<CategoryModel> getAllCategories() {
-        return categoriesRepository.findAll();
+    public Response<CategoryModel> getAllCategories() {
+        Response<CategoryModel> response = new Response<CategoryModel>();
+        Map<String,String> errorMap = new HashMap<>();
+        List<CategoryModel> categoryModelList = categoriesRepository.findAll();
+        if(categoryModelList == null){
+            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            errorMap.put(Contants.ERROR,"No Category found");
+            response.setErrorMap(errorMap);
+            response.setResponseDesc(Contants.FALIURE);
+            return response;
+        }
+        response.setResponseWrapper(categoryModelList);
+        response.setResponseDesc(Contants.SUCCESS);
+        response.setResponseCode(Contants.OK_200);
+        return response;
     }
 
 

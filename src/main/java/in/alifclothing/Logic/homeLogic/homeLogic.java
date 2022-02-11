@@ -1,5 +1,6 @@
 package in.alifclothing.Logic.homeLogic;
 
+import in.alifclothing.Dto.Response;
 import in.alifclothing.model.UserModel;
 import javassist.NotFoundException;
 
@@ -10,11 +11,11 @@ import java.util.Optional;
 
 public interface homeLogic {
 
-    public UserModel persistUser(UserModel userModel);
+    public Response<?> persistUser(UserModel userModel);
 
     public List<UserModel> get();
 
-    public void updateResetPassword(String token, String email) throws NotFoundException;
+    public Response<?> updateResetPassword(String token, String email) throws NotFoundException;
 
     public UserModel getUserFromResetPasswordToken(String resetPasswordToken);
 

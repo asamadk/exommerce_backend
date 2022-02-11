@@ -1,5 +1,6 @@
 package in.alifclothing.Logic.userLogic;
 
+import in.alifclothing.Dto.Response;
 import in.alifclothing.model.*;
 
 import java.util.List;
@@ -7,39 +8,39 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public interface userLogic {
-    ShoppingCartModel addProductToCart(Integer product_id,String username);
+    Response<ShoppingCartModel> addProductToCart(Integer product_id,String username);
 
-    ShoppingCartModel getUserCart(String email);
+    Response<ShoppingCartModel> getUserCart(String email);
 
-    AtomicBoolean deleteProductFromCart(Integer product_id, Integer cart_id);
+    Response<String> deleteProductFromCart(Integer product_id, Integer cart_id);
 
-    boolean addCouponToCart(CouponsModel couponsModel,Integer cartId);
+    Response<String > addCouponToCart(CouponsModel couponsModel,Integer cartId);
 
-    List<CouponsModel> getAllCoupons();
+    Response<CouponsModel> getAllCoupons();
 
-    boolean deleteCouponFromCart(Integer cartId);
+    Response<String> deleteCouponFromCart(Integer cartId);
 
-    UserModel getUser(String email);
+    Response<UserModel> getUser(String email);
 
-    boolean updateCurrentUser(UserModel userModel,Integer uid);
+    Response<UserModel> updateCurrentUser(UserModel userModel,Integer uid);
 
-    boolean createOrderFromCart(String email);
+    Response<String> createOrderFromCart(String email);
 
-    List<OrderModel> getAllOrdersOfUser(String email);
+    Response<OrderModel> getAllOrdersOfUser(String email);
 
-    OrderModel getSingleOrderOfUser(Integer order_id);
+    Response<OrderModel> getSingleOrderOfUser(Integer order_id);
 
-    List<ProductModel> getAllProducts();
+    Response<ProductModel> getAllProducts();
 
-    ProductModel getSingleProduct(Integer product_id);
+    Response<ProductModel> getSingleProduct(Integer product_id);
 
-    List<ProductModel> getAllProductsByCategory(Integer category_id);
+    Response<ProductModel> getAllProductsByCategory(Integer category_id);
 
-    boolean addProductToWishlist(Integer product_id, String email);
+    Response<String> addProductToWishlist(Integer product_id, String email);
 
-    WishlistModel getUserWishlist(String email);
+    Response<WishlistModel> getUserWishlist(String email);
 
-    boolean deleteProductFromWishlist(Integer product_id,Integer wishlist_id);
+    Response<String> deleteProductFromWishlist(Integer product_id,Integer wishlist_id);
 
-    List<CategoryModel> getAllCategories();
+    Response<CategoryModel> getAllCategories();
 }

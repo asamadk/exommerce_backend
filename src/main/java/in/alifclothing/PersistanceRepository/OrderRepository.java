@@ -12,4 +12,7 @@ import java.util.Optional;
 public interface OrderRepository extends JpaRepository<OrderModel,Integer> {
     @Query("select o from  OrderModel o where o.userModel.user_id= :id")
     List<OrderModel> findByUserId(@Param("id") Integer id);
+
+    @Query("select o from OrderModel o where o.userModel.email = :email")
+    List<OrderModel> findByEmailId(@Param("email") String email);
 }
