@@ -14,6 +14,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -47,15 +49,29 @@ public class securityConfiguration extends WebSecurityConfigurerAdapter {
         auth.authenticationProvider(daoAuthenticationProvider());
     }
 
+    @Bean
+	public CorsConfigurationSource corsConfigurationSource() {
+		final CorsConfiguration configuration  = new CorsConfiguration();
+		//Preflight is a HTTP request that is sent before actual HTTP request sent by browser. These request is created
+		//by the browser.The browser check and it doesn't allow HTTPResponse if we don't configure
+		//CORS(Cross Origin Resource Sharing) for the webservices end point.
+		//configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080",""));
+		configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+		//configuration.setAllowedMethods(Arrays.asList("GET","PUT","POST","DELETE","OPTIONS"));
+		configuration.setAllowedMethods(Arrays.asList("*")); //We use asterik, so that all HTTP methods are allowed.
+		//If we want to allow credentials for HTTPResponse and credentials, here, are cookies and Authorization header.
+		//Or, it could be SSL client certificate.If we want this info to be included, then credentials set to true.
+		configuration.setAllowCredentials(true);
+		//configuration.setAllowedHeaders(Arrays.asList("Authorization","Cache-Control","Content-Type"));
+		configuration.setAllowedHeaders(Arrays.asList("*"));//Allowed all headers.
+		final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		//source.registerCorsConfiguration("/authenticate", configuration);
+		source.registerCorsConfiguration("/**", configuration); //Specify the path pattern.
+		return (CorsConfigurationSource) source;
+	}
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
-        corsConfiguration.setAllowedOrigins(Collections.singletonList("*"));
-        corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
-        corsConfiguration.setAllowCredentials(true);
-        corsConfiguration.setExposedHeaders(Collections.singletonList("Authorization"));
-
         http.cors().and()
                 .csrf().disable()
                 .sessionManagement()
