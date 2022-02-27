@@ -62,7 +62,7 @@ public class securityConfiguration extends WebSecurityConfigurerAdapter {
 		//If we want to allow credentials for HTTPResponse and credentials, here, are cookies and Authorization header.
 		//Or, it could be SSL client certificate.If we want this info to be included, then credentials set to true.
 		configuration.setAllowCredentials(true);
-		//configuration.setAllowedHeaders(Arrays.asList("Authorization","Cache-Control","Content-Type"));
+//		configuration.setAllowedHeaders(Arrays.asList("Authorization","Cache-Control","Content-Type"));
 		configuration.setAllowedHeaders(Arrays.asList("*"));//Allowed all headers.
 		final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		//source.registerCorsConfiguration("/authenticate", configuration);

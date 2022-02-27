@@ -14,7 +14,7 @@ public interface userLogic {
 
     Response<String> deleteProductFromCart(Integer product_id, Integer cart_id);
 
-    Response<String > addCouponToCart(CouponsModel couponsModel,Integer cartId);
+    Response<String > addCouponToCart(String couponName,Integer cartId);
 
     Response<CouponsModel> getAllCoupons();
 
@@ -30,7 +30,7 @@ public interface userLogic {
 
     Response<OrderModel> getSingleOrderOfUser(Integer order_id);
 
-    Response<ProductModel> getAllProducts();
+    Response<ProductModel> getAllProducts(String orderBy,String limit);
 
     Response<ProductModel> getSingleProduct(Integer product_id);
 

@@ -55,10 +55,10 @@ public class UserController {
     }
 
     //coupon model as body
-    @PostMapping("/cart/coupon/{cart_id}")
-    public ResponseEntity<Response<String>> addcoupon(@RequestBody CouponsModel couponsModel,@PathVariable("cart_id") Integer cartId){
+    @PostMapping("/cart/coupon")
+    public ResponseEntity<Response<String>> addcoupon(@RequestParam("couponName") String couponName,@RequestParam("cartId") String cartId){
 
-        Response<String> response = userLogic.addCouponToCart(couponsModel,cartId);
+        Response<String> response = userLogic.addCouponToCart(couponName,Integer.parseInt(cartId));
         if(response.getErrorMap() == null){
             return new ResponseEntity<Response<String>>(response,HttpStatus.OK);
         }
@@ -78,15 +78,15 @@ public class UserController {
         return new ResponseEntity<Response<String>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @GetMapping("/products")
-    public ResponseEntity<Response<ProductModel>> getProducts(){
-        Response<ProductModel> response = userLogic.getAllProducts();
-        if(response.getErrorMap() == null){
-            return new ResponseEntity<Response<ProductModel>>(response, HttpStatus.OK);
-        }
-
-        return new ResponseEntity<Response<ProductModel>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+//    @GetMapping("/products")
+//    public ResponseEntity<Response<ProductModel>> getProducts(){
+//        Response<ProductModel> response = userLogic.getAllProducts();
+//        if(response.getErrorMap() == null){
+//            return new ResponseEntity<Response<ProductModel>>(response, HttpStatus.OK);
+//        }
+//
+//        return new ResponseEntity<Response<ProductModel>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
+//    }
 
     @GetMapping("/product/{product_id}")
     public ResponseEntity<Response<ProductModel>> getProduct(@PathVariable("product_id") Integer product_id){

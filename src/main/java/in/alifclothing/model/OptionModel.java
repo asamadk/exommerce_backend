@@ -6,7 +6,7 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "SizeOption")
+@Table(name = "size_option")
 public class OptionModel {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

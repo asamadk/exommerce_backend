@@ -9,4 +9,6 @@ public class Contants {
     public static final String FALIURE = "Faliure";
     public static final String ERROR = "Error";
 
+    public static final String NO_LIMIT = "infi";
+
 }

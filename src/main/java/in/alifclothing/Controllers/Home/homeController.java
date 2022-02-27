@@ -81,8 +81,9 @@ public class homeController {
 
 
     @GetMapping("/products")
-    public ResponseEntity<Response<ProductModel>> fetchproducts(){
-        Response<ProductModel> response = userLogic.getAllProducts();
+    public ResponseEntity<Response<ProductModel>> fetchproducts(@RequestParam("order") String orderBy,
+                                                                @RequestParam("limit") String limit){
+        Response<ProductModel> response = userLogic.getAllProducts(orderBy,limit);
         if(response.getErrorMap() == null){
             return new ResponseEntity<Response<ProductModel>>(response,HttpStatus.OK);
         }

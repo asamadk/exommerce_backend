@@ -6,6 +6,7 @@ import in.alifclothing.PersistanceRepository.*;
 import in.alifclothing.model.*;
 import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -57,7 +58,7 @@ public class userLogicImplementation implements userLogic{
                 shoppingCartModel.setCouponsModel(null);
                 shoppingCartModel.setCouponUsed(false);
                 float total = shoppingCartModel.getTotalAmountBeforeDiscount();
-                total += productModel.getProduct_price();
+                total += productModel.getProduct_real_price();
                 shoppingCartModel.setTotalAmountBeforeDiscount(total);
                 shoppingCartModel.setTotal(total);
                 shoppingCartRepository.save(shoppingCartModel);
@@ -68,8 +69,8 @@ public class userLogicImplementation implements userLogic{
                 List<ProductModel> productModelList = new ArrayList<>();
                 productModelList.add(productModel);
                 shoppingCartModel.setProductModelList(productModelList);
-                shoppingCartModel.setTotalAmountBeforeDiscount(productModel.getProduct_price());
-                shoppingCartModel.setTotal(productModel.getProduct_price());
+                shoppingCartModel.setTotalAmountBeforeDiscount(productModel.getProduct_real_price());
+                shoppingCartModel.setTotal(productModel.getProduct_real_price());
                 shoppingCartModel.setShoppingCartDate(new java.sql.Date(time));
                 shoppingCartRepository.save(shoppingCartModel);
 
@@ -153,37 +154,45 @@ public class userLogicImplementation implements userLogic{
     }
 
     @Override
-    public Response<String> addCouponToCart(CouponsModel couponsModel, Integer cartId) {
+    public Response<String> addCouponToCart(String couponName, Integer cartId) {
 
         Response<String> response = new Response<>();
         Map<String,String> errorMap = new HashMap<>();
 
         Optional<ShoppingCartModel> shoppingCartModel = shoppingCartRepository.findById(cartId);
-        Optional<CouponsModel> couponName = Optional.ofNullable(couponRepository.findByCouponName(couponsModel.getCouponName()));
-        shoppingCartModel.ifPresent(cart -> {
-            if(!Objects.equals(couponsModel.getCouponName(), "")){
-                couponName.ifPresent(coupon -> {
-                    cart.setCouponsModel(coupon);
-                    cart.setCouponUsed(true);
+        Optional<CouponsModel> couponsModel = Optional.ofNullable(couponRepository.findByCouponName(couponName));
+        if(couponsModel.isPresent()) {
+            shoppingCartModel.ifPresent(cart -> {
+                if (!Objects.equals(couponsModel.get().getCouponName(), "")) {
+                    couponsModel.ifPresent(coupon -> {
+                        cart.setCouponsModel(coupon);
+                        cart.setCouponUsed(true);
 
-                    List<ProductModel> productModelList = cart.getProductModelList();
-                    float totalbeforediscount = 0;
-                    for(ProductModel productModel: productModelList){
-                        totalbeforediscount += productModel.getProduct_price();
-                    }
-                    float total = totalbeforediscount;
-                    if(cart.isCouponUsed())
-                        total = total * (cart.getCouponsModel().getCouponDiscount()/100F);
-                    cart.setTotal(total);
-                    cart.setTotalAmountBeforeDiscount(totalbeforediscount);
+                        List<ProductModel> productModelList = cart.getProductModelList();
+                        float totalbeforediscount = 0;
+                        for (ProductModel productModel : productModelList) {
+                            totalbeforediscount += productModel.getProduct_price();
+                        }
+                        float total = totalbeforediscount;
+                        if (cart.isCouponUsed())
+                            total = total * (cart.getCouponsModel().getCouponDiscount() / 100F);
+                        cart.setTotal(total);
+                        cart.setTotalAmountBeforeDiscount(totalbeforediscount);
 
-                    response.setResponseWrapper(Arrays.asList("Coupon added successfully"));
-                    response.setResponseDesc(Contants.SUCCESS);
-                    response.setResponseCode(Contants.OK_200);
-                    shoppingCartRepository.save(cart);
-                });
-            }
-        });
+                        response.setResponseWrapper(Arrays.asList("Coupon added successfully"));
+                        response.setResponseDesc(Contants.SUCCESS);
+                        response.setResponseCode(Contants.OK_200);
+                        shoppingCartRepository.save(cart);
+                    });
+                }
+            });
+        }else{
+            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            errorMap.put(Contants.ERROR,"No coupon found");
+            response.setErrorMap(errorMap);
+            response.setResponseDesc(Contants.FALIURE);
+            return response;
+        }
 
         if(!shoppingCartModel.isPresent()){
             response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
@@ -192,12 +201,6 @@ public class userLogicImplementation implements userLogic{
             response.setResponseDesc(Contants.FALIURE);
         }
 
-        if(!couponName.isPresent()){
-            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
-            errorMap.put(Contants.ERROR,"No coupon found");
-            response.setErrorMap(errorMap);
-            response.setResponseDesc(Contants.FALIURE);
-        }
         return response;
     }
 
@@ -401,8 +404,17 @@ public class userLogicImplementation implements userLogic{
     }
 
     @Override
-    public Response<ProductModel> getAllProducts() {
-        List<ProductModel> productModelList =  productRepository.findAll();
+    public Response<ProductModel> getAllProducts(String orderBy,String limit) {
+
+        List<ProductModel> productModelList = null;
+//        if(limit != Contants.NO_LIMIT){
+//            productModelList = productRepository.findByLimit(Integer.valueOf(limit));
+//        }
+        if(orderBy == null) {
+             productModelList = productRepository.findAll();
+        }else{
+            productModelList = productRepository.findInOrder();
+        }
         Response<ProductModel> response = new Response<ProductModel>();
         Map<String,String> errorMap = new HashMap<>();
 
