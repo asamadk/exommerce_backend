@@ -280,7 +280,7 @@ public class userLogicImplementation implements userLogic{
         Optional<UserModel> checkUser = userRepository.findById(uid);
         checkUser.ifPresent(user -> {
             try {
-                if(Objects.equals(user.getEmail(), userModel.getEmail())){
+//                if(Objects.equals(user.getEmail(), userModel.getEmail())){
                     userModel.setUser_id(uid);
                     userModel.setRole(user.getRole());
                     userModel.setUser_email_verified(user.isUser_email_verified());
@@ -295,11 +295,11 @@ public class userLogicImplementation implements userLogic{
                     response.setResponseWrapper(userModelList);
                     response.setResponseDesc(Contants.SUCCESS);
                     response.setResponseCode(Contants.OK_200);
-                }
-                response.setResponseCode(Contants.NOT_FOUND_404);
-                errorMap.put(Contants.ERROR,"Email do not match");
-                response.setErrorMap(errorMap);
-                response.setResponseDesc(Contants.FALIURE);
+//                }
+//                response.setResponseCode(Contants.NOT_FOUND_404);
+//                errorMap.put(Contants.ERROR,"Email do not match");
+//                response.setErrorMap(errorMap);
+//                response.setResponseDesc(Contants.FALIURE);
             }catch (Exception exception){
                 exception.printStackTrace();
             }
