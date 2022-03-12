@@ -58,7 +58,7 @@ public class userLogicImplementation implements userLogic{
                 shoppingCartModel.setCouponsModel(null);
                 shoppingCartModel.setCouponUsed(false);
                 float total = shoppingCartModel.getTotalAmountBeforeDiscount();
-                total += productModel.getProduct_real_price();
+                total = total + productModel.getProduct_real_price();
                 shoppingCartModel.setTotalAmountBeforeDiscount(total);
                 shoppingCartModel.setTotal(total);
                 shoppingCartRepository.save(shoppingCartModel);
@@ -134,7 +134,7 @@ public class userLogicImplementation implements userLogic{
                 shoppingCartModel.getProductModelList().remove(productModel);
                 shoppingCartModel.setCouponsModel(null);
                 shoppingCartModel.setCouponUsed(false);
-                shoppingCartModel.setTotalAmountBeforeDiscount(shoppingCartModel.getTotalAmountBeforeDiscount() - productModel.getProduct_price());
+                shoppingCartModel.setTotalAmountBeforeDiscount(shoppingCartModel.getTotalAmountBeforeDiscount() - productModel.getProduct_real_price());
                 shoppingCartModel.setTotal(0F);
                 if(shoppingCartModel.getProductModelList().isEmpty())shoppingCartModel.setTotalAmountBeforeDiscount(0F);
                 shoppingCartRepository.save(shoppingCartModel);
@@ -171,7 +171,7 @@ public class userLogicImplementation implements userLogic{
                         List<ProductModel> productModelList = cart.getProductModelList();
                         float totalbeforediscount = 0;
                         for (ProductModel productModel : productModelList) {
-                            totalbeforediscount += productModel.getProduct_price();
+                            totalbeforediscount += productModel.getProduct_real_price();
                         }
                         float total = totalbeforediscount;
                         if (cart.isCouponUsed())
