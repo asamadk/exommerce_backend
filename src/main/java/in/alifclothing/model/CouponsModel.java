@@ -14,9 +14,13 @@ public class CouponsModel {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int couponsId;
     private String couponName;
-    private int couponDiscount;
-    private int minimumPurchasePrice;
-    private int maximumDiscount;
+    @Column(nullable = true)
+    private Integer couponDiscount;
+    @Column(nullable = true)
+    private Integer minimumPurchasePrice = 0;
+    @Column(nullable = true)
+    private Integer maximumDiscount = 0;
+    @Column(nullable = true)
     private Date expireDate;
     @JsonIgnore
     @OneToMany(mappedBy = "couponsModel")
