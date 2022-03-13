@@ -117,9 +117,21 @@ public class homeLogicImplementation implements homeLogic {
     }
 
     @Override
-    public boolean checkRestPaswordLink(String token) {
+    public Response<String> checkRestPaswordLink(String token) {
+        Map<String,String> errorMap = new HashMap<>();
+        Response<String> response = new Response<>();
         Optional<UserModel> userModelOptional = Optional.ofNullable(userRepository.findByResetPasswordToken(token));
-        return userModelOptional.isPresent();
+        if(userModelOptional.isPresent()){
+            response.setResponseCode(Contants.OK_200);
+            response.setResponseDesc(Contants.SUCCESS);
+            response.setResponseWrapper(Arrays.asList("Token verified"));
+        }else{
+            errorMap.put(Contants.ERROR,Contants.UNAUTH_TOKEN);
+            response.setErrorMap(errorMap);
+            response.setResponseWrapper(null);
+            response.setResponseCode(Contants.CLIENT_400);
+        }
+        return response;
     }
 
     @Override
@@ -131,6 +143,32 @@ public class homeLogicImplementation implements homeLogic {
             userRepository.save(user);
         });
         return userModelOptional.isPresent();
+    }
+
+    @Override
+    public Response<String> sendMessageContactUs(String name, String email, String subject, String body) throws MessagingException, UnsupportedEncodingException {
+        Map<String,String> errorMap = new HashMap<>();
+        Response<String> response = new Response<>();
+        try {
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message);
+            helper.setFrom(email, "Alif Support");
+            helper.setTo("alif@alifclothing.in");
+            helper.setText(String.valueOf(body), false);
+            helper.setSubject(subject);
+            javaMailSender.send(message);
+            response.setResponseDesc(Contants.SUCCESS);
+            response.setResponseCode(Contants.OK_200);
+            response.setResponseWrapper(Arrays.asList("Mail Sent"));
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            response.setResponseWrapper(null);
+            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            response.setResponseDesc(Contants.FALIURE);
+            errorMap.put(Contants.ERROR,e.getMessage());
+            response.setErrorMap(errorMap);
+        }
+        return response;
     }
 
 

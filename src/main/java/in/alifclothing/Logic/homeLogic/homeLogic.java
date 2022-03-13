@@ -23,8 +23,10 @@ public interface homeLogic {
 
     public void sendEmail(String email, String resetPasswordLink) throws MessagingException, UnsupportedEncodingException;
 
-    public boolean checkRestPaswordLink(String token);
+    public Response<String> checkRestPaswordLink(String token);
 
     public boolean checkResetPasswordLinkandChangePassword(String token,String password);
+
+    public Response<String> sendMessageContactUs(String name,String email,String subject, String body) throws MessagingException, UnsupportedEncodingException;
 
 }

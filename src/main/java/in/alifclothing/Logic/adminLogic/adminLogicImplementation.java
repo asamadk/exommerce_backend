@@ -136,8 +136,8 @@ public class adminLogicImplementation implements adminLogic{
         List<String> uploadURL = new ArrayList<>();
         Arrays.stream(files).forEach(file -> {
             String filename = fileStorageService.storeFile(file);
-            String url = ServletUriComponentsBuilder.fromCurrentContextPath().path("/download/").path(filename).toUriString();
-            uploadURL.add(url);
+//            String url = ServletUriComponentsBuilder.fromCurrentContextPath().path("/download/").path(filename).toUriString();
+            uploadURL.add(filename);
         });
 
         long millis = System.currentTimeMillis();

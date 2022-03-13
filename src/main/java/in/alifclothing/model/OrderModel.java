@@ -22,6 +22,7 @@ public class OrderModel {
     @ManyToOne
     private OrderStatus orderStatus;
     private String razorpay_order_id;
+    private String couponName;
 
     public OrderModel(UserModel userModel, List<ProductModel> productModelList,
                       float price, Date orderDate, String orderTrackingNumber,
@@ -33,6 +34,18 @@ public class OrderModel {
         this.orderTrackingNumber = orderTrackingNumber;
         this.orderStatus = orderStatus;
         this.razorpay_order_id = razorpay_order_id;
+    }
+
+    public OrderModel(int orderId, UserModel userModel, List<ProductModel> productModelList, float price, Date orderDate, String orderTrackingNumber, OrderStatus orderStatus, String razorpay_order_id, String couponName) {
+        OrderId = orderId;
+        this.userModel = userModel;
+        this.productModelList = productModelList;
+        this.price = price;
+        this.orderDate = orderDate;
+        this.orderTrackingNumber = orderTrackingNumber;
+        this.orderStatus = orderStatus;
+        this.razorpay_order_id = razorpay_order_id;
+        this.couponName = couponName;
     }
 
     public OrderModel() {
@@ -101,5 +114,13 @@ public class OrderModel {
 
     public void setRazorpay_order_id(String razorpay_order_id) {
         this.razorpay_order_id = razorpay_order_id;
+    }
+
+    public String getCouponName() {
+        return couponName;
+    }
+
+    public void setCouponName(String couponName) {
+        this.couponName = couponName;
     }
 }

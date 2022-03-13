@@ -8,7 +8,10 @@ public class Contants {
     public static final String SUCCESS = "Success";
     public static final String FALIURE = "Faliure";
     public static final String ERROR = "Error";
+    public static final String UNAUTH_TOKEN = "Token is not correct";
 
     public static final String NO_LIMIT = "infi";
+    public static final String DESCENDING = "DESC";
+    public static final String ASCENDING = "ASC";
 
 }

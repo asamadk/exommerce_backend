@@ -1,5 +1,6 @@
 package in.alifclothing.Controllers.Home;
 
+import in.alifclothing.Dto.ContactUs;
 import in.alifclothing.Dto.Response;
 import in.alifclothing.Helper.Contants;
 import in.alifclothing.Logic.homeLogic.homeLogic;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -86,6 +88,10 @@ public class homeController {
         Response<ProductModel> response = userLogic.getAllProducts(orderBy,limit);
         if(response.getErrorMap() == null){
             return new ResponseEntity<Response<ProductModel>>(response,HttpStatus.OK);
+        }else{
+            if(response.getResponseCode().equals(Contants.NOT_FOUND_404)){
+                return new ResponseEntity<Response<ProductModel>>(response,HttpStatus.NOT_FOUND);
+            }
         }
 
         return new ResponseEntity<Response<ProductModel>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
@@ -155,16 +161,51 @@ public class homeController {
         return new ResponseEntity<Response<?>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @GetMapping("/reset_password")
-    public ResponseEntity<String> showResetPasswordForm(@Param(value = "token") String token){
-        if(homeLogic.checkRestPaswordLink(token))return ResponseEntity.ok("Token verified");
-        return ResponseEntity.internalServerError().body("Token not verified");
+    @PostMapping("/contactUsMail")
+    public ResponseEntity<Response<String>> contactUsMail(@RequestBody ContactUs contactUs) throws MessagingException, UnsupportedEncodingException {
+        Response<String> response = homeLogic.sendMessageContactUs(contactUs.getName(),contactUs.getEmail(),contactUs.getSubject(),contactUs.getBody());
+        if(response.getErrorMap() == null){
+            return new ResponseEntity<Response<String>>(response,HttpStatus.OK);
+        }
+        return new ResponseEntity<Response<String>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @GetMapping("/reset_password")
+    public ResponseEntity<Response<String>> showResetPasswordForm(@RequestParam(value = "token") String token){
+        Response<String> response = homeLogic.checkRestPaswordLink(token);
+        if(response.getErrorMap() == null){
+            return new ResponseEntity<Response<String>>(response,HttpStatus.OK);
+        }else{
+            if(response.getResponseCode() == Contants.NOT_FOUND_404) {
+                return new ResponseEntity<Response<String>>(response, HttpStatus.NOT_FOUND);
+            }else if(response.getResponseCode() == Contants.CLIENT_400){
+                return new ResponseEntity<Response<String>>(response,HttpStatus.UNAUTHORIZED);
+            }
+        }
+        return new ResponseEntity<Response<String>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     //previous link when clicked a form with change password will appear and the the below post mapping will do its job
     @PostMapping("/changePassword")
-    public ResponseEntity<String> changePasswordUsingLink(@Param(value = "token") String token,@RequestPart("password") String password,HttpServletRequest request){
+    public ResponseEntity<String> changePasswordUsingLink(@RequestParam(value = "token") String token,@RequestPart("password") String password,HttpServletRequest request){
         if(homeLogic.checkResetPasswordLinkandChangePassword(token,password))return ResponseEntity.ok("Password changed succesfully");
         return ResponseEntity.internalServerError().body("Password not changed");
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Response<ProductModel>> showProductsOnSearch(@RequestParam("product_name") String productName){
+
+        Response<ProductModel> response = userLogic.searchProducts(productName);
+        if(response.getErrorMap() == null){
+            return new ResponseEntity<Response<ProductModel>>(response,HttpStatus.OK);
+        }else{
+            if(response.getResponseCode().equals(Contants.NOT_FOUND_404)) {
+                return new ResponseEntity<Response<ProductModel>>(response, HttpStatus.NOT_FOUND);
+            }else if(response.getResponseCode().equals(Contants.CLIENT_400)){
+                return new ResponseEntity<Response<ProductModel>>(response,HttpStatus.UNAUTHORIZED);
+            }
+        }
+        return new ResponseEntity<Response<ProductModel>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 }

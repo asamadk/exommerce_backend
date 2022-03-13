@@ -1,6 +1,7 @@
 package in.alifclothing.Controllers.User;
 
 import in.alifclothing.Dto.Response;
+import in.alifclothing.Helper.Contants;
 import in.alifclothing.Logic.userLogic.userLogic;
 import in.alifclothing.model.*;
 import org.aspectj.weaver.ast.Or;
@@ -26,6 +27,10 @@ public class UserController {
         Response<ShoppingCartModel> response = userLogic.addProductToCart(product_id,principal.getName());
         if(response.getErrorMap() == null){
             return new ResponseEntity<Response<ShoppingCartModel>>(response,HttpStatus.OK);
+        }else{
+            if(response.getResponseCode().equals(Contants.NOT_FOUND_404)){
+                return new ResponseEntity<Response<ShoppingCartModel>>(response,HttpStatus.NOT_FOUND);
+            }
         }
 
         return new ResponseEntity<Response<ShoppingCartModel>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
@@ -38,6 +43,10 @@ public class UserController {
         Response<ShoppingCartModel> response = userLogic.getUserCart(principal.getName());
         if(response.getErrorMap() == null){
             return new ResponseEntity<Response<ShoppingCartModel>>(response,HttpStatus.OK);
+        }else{
+            if(response.getResponseCode().equals(Contants.NOT_FOUND_404)){
+                return new ResponseEntity<Response<ShoppingCartModel>>(response,HttpStatus.NOT_FOUND);
+            }
         }
 
         return new ResponseEntity<Response<ShoppingCartModel>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
@@ -49,6 +58,10 @@ public class UserController {
         Response<String> response = userLogic.deleteProductFromCart(product_id,cart_id);
         if(response.getErrorMap() == null){
             return new ResponseEntity<Response<String>>(response,HttpStatus.OK);
+        }else{
+            if(response.getResponseCode().equals(Contants.NOT_FOUND_404)){
+                return new ResponseEntity<Response<String>>(response,HttpStatus.NOT_FOUND);
+            }
         }
 
         return new ResponseEntity<Response<String>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
@@ -61,6 +74,10 @@ public class UserController {
         Response<String> response = userLogic.addCouponToCart(couponName,Integer.parseInt(cartId));
         if(response.getErrorMap() == null){
             return new ResponseEntity<Response<String>>(response,HttpStatus.OK);
+        }else{
+            if(response.getResponseCode().equals(Contants.NOT_FOUND_404)) {
+                return new ResponseEntity<Response<String>>(response, HttpStatus.NOT_FOUND);
+            }
         }
 
         return new ResponseEntity<Response<String>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
@@ -73,26 +90,24 @@ public class UserController {
         Response<String> response = userLogic.deleteCouponFromCart(cartId);
         if(response.getErrorMap() == null){
             return new ResponseEntity<Response<String>>(response,HttpStatus.OK);
+        }else{
+            if(response.getResponseCode().equals(Contants.NOT_FOUND_404)){
+                return new ResponseEntity<Response<String>>(response,HttpStatus.NOT_FOUND);
+            }
         }
 
         return new ResponseEntity<Response<String>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
-//    @GetMapping("/products")
-//    public ResponseEntity<Response<ProductModel>> getProducts(){
-//        Response<ProductModel> response = userLogic.getAllProducts();
-//        if(response.getErrorMap() == null){
-//            return new ResponseEntity<Response<ProductModel>>(response, HttpStatus.OK);
-//        }
-//
-//        return new ResponseEntity<Response<ProductModel>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
-//    }
 
     @GetMapping("/product/{product_id}")
     public ResponseEntity<Response<ProductModel>> getProduct(@PathVariable("product_id") Integer product_id){
         Response<ProductModel> response = userLogic.getSingleProduct(product_id);
         if(response.getErrorMap() == null){
             return new ResponseEntity<Response<ProductModel>>(response,HttpStatus.OK);
+        }else{
+            if(response.getResponseCode().equals(Contants.NOT_FOUND_404)){
+                return new ResponseEntity<Response<ProductModel>>(response,HttpStatus.NOT_FOUND);
+            }
         }
 
         return new ResponseEntity<Response<ProductModel>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
@@ -103,6 +118,10 @@ public class UserController {
         Response<ProductModel> response = userLogic.getAllProductsByCategory(category_id);
         if(response.getErrorMap() == null){
             return new ResponseEntity<Response<ProductModel>>(response,HttpStatus.OK);
+        }else{
+            if(response.getResponseCode().equals(Contants.NOT_FOUND_404)){
+                return new ResponseEntity<Response<ProductModel>>(response,HttpStatus.NOT_FOUND);
+            }
         }
 
         return new ResponseEntity<Response<ProductModel>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
@@ -124,6 +143,10 @@ public class UserController {
         Response<UserModel> response = userLogic.getUser(principal.getName());
         if(response.getErrorMap() == null){
             return new ResponseEntity<Response<UserModel>>(response,HttpStatus.OK);
+        }else{
+            if(response.getResponseCode().equals(Contants.NOT_FOUND_404)){
+                return new ResponseEntity<Response<UserModel>>(response,HttpStatus.NOT_FOUND);
+            }
         }
 
         return new ResponseEntity<Response<UserModel>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
@@ -135,6 +158,10 @@ public class UserController {
         Response<UserModel> response = userLogic.updateCurrentUser(userModel,uid);
         if(response.getErrorMap() == null){
             return new ResponseEntity<Response<UserModel>>(response,HttpStatus.OK);
+        }else{
+            if(response.getResponseCode().equals(Contants.NOT_FOUND_404)){
+                return new ResponseEntity<Response<UserModel>>(response,HttpStatus.NOT_FOUND);
+            }
         }
 
         return new ResponseEntity<Response<UserModel>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
@@ -145,6 +172,10 @@ public class UserController {
         Response<CouponsModel> response = userLogic.getAllCoupons();
         if(response.getErrorMap() == null){
             return new ResponseEntity<Response<CouponsModel>>(response,HttpStatus.OK);
+        }else{
+            if(response.getResponseCode().equals(Contants.NOT_FOUND_404)){
+                return new ResponseEntity<Response<CouponsModel>>(response,HttpStatus.NOT_FOUND);
+            }
         }
 
         return new ResponseEntity<Response<CouponsModel>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
@@ -157,6 +188,10 @@ public class UserController {
         Response<String> response = userLogic.createOrderFromCart(principal.getName());
         if(response.getErrorMap() == null){
             return new ResponseEntity<Response<String>>(response,HttpStatus.OK);
+        }else{
+            if(response.getResponseCode().equals(Contants.NOT_FOUND_404)){
+                return new ResponseEntity<Response<String>>(response,HttpStatus.NOT_FOUND);
+            }
         }
 
         return new ResponseEntity<Response<String>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
@@ -168,6 +203,10 @@ public class UserController {
         Response<OrderModel> response = userLogic.getAllOrdersOfUser(principal.getName());
         if(response.getErrorMap() == null){
             return new ResponseEntity<Response<OrderModel>>(response,HttpStatus.OK);
+        }else{
+            if(response.getResponseCode().equals(Contants.NOT_FOUND_404)){
+                return new ResponseEntity<Response<OrderModel>>(response,HttpStatus.NOT_FOUND);
+            }
         }
 
         return new ResponseEntity<Response<OrderModel>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
@@ -179,6 +218,10 @@ public class UserController {
         Response<OrderModel> response = userLogic.getSingleOrderOfUser(order_id);
         if(response.getErrorMap() == null){
             return new ResponseEntity<Response<OrderModel>>(response,HttpStatus.OK);
+        }else{
+            if(response.getResponseCode().equals(Contants.NOT_FOUND_404)){
+                return new ResponseEntity<Response<OrderModel>>(response,HttpStatus.NOT_FOUND);
+            }
         }
 
         return new ResponseEntity<Response<OrderModel>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
@@ -190,6 +233,10 @@ public class UserController {
         Response<String > response = userLogic.addProductToWishlist(product_id,principal.getName());
         if(response.getErrorMap() == null){
             return new ResponseEntity<Response<String>>(response,HttpStatus.OK);
+        }else{
+            if(response.getResponseCode().equals(Contants.NOT_FOUND_404)){
+                return new ResponseEntity<Response<String>>(response,HttpStatus.NOT_FOUND);
+            }
         }
 
         return new ResponseEntity<Response<String>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
@@ -201,6 +248,10 @@ public class UserController {
         Response<WishlistModel > response = userLogic.getUserWishlist(principal.getName());
         if(response.getErrorMap() == null){
             return new ResponseEntity<Response<WishlistModel>>(response,HttpStatus.OK);
+        }else{
+            if(response.getResponseCode().equals(Contants.NOT_FOUND_404)){
+                return new ResponseEntity<Response<WishlistModel>>(response,HttpStatus.NOT_FOUND);
+            }
         }
 
         return new ResponseEntity<Response<WishlistModel>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
@@ -212,6 +263,10 @@ public class UserController {
         Response<String > response = userLogic.deleteProductFromWishlist(product_id,wishlist_id);
         if(response.getErrorMap() == null){
             return new ResponseEntity<Response<String>>(response,HttpStatus.OK);
+        }else{
+            if(response.getResponseCode().equals(Contants.NOT_FOUND_404)){
+                return new ResponseEntity<Response<String>>(response,HttpStatus.NOT_FOUND);
+            }
         }
 
         return new ResponseEntity<Response<String>>(response,HttpStatus.INTERNAL_SERVER_ERROR);

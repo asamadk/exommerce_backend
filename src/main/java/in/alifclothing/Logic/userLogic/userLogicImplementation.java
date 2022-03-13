@@ -6,6 +6,9 @@ import in.alifclothing.PersistanceRepository.*;
 import in.alifclothing.model.*;
 import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -38,7 +41,7 @@ public class userLogicImplementation implements userLogic{
 
         UserModel user = userRepository.findByEmail(email);
         if(user == null){
-            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            response.setResponseCode(Contants.NOT_FOUND_404);
             errorMap.put(Contants.ERROR,"No user found");
             response.setErrorMap(errorMap);
             response.setResponseDesc(Contants.FALIURE);
@@ -81,7 +84,7 @@ public class userLogicImplementation implements userLogic{
             response.setResponseDesc(Contants.SUCCESS);
             response.setResponseCode(Contants.OK_200);
         }else{
-            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            response.setResponseCode(Contants.NOT_FOUND_404);
             errorMap.put(Contants.ERROR,"No product found");
             response.setErrorMap(errorMap);
             response.setResponseDesc(Contants.FALIURE);
@@ -99,7 +102,7 @@ public class userLogicImplementation implements userLogic{
 
         UserModel user = userRepository.findByEmail(email);
         if(user == null){
-            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            response.setResponseCode(Contants.NOT_FOUND_404);
             errorMap.put(Contants.ERROR,"No user found");
             response.setErrorMap(errorMap);
             response.setResponseDesc(Contants.FALIURE);
@@ -114,7 +117,7 @@ public class userLogicImplementation implements userLogic{
             response.setResponseDesc(Contants.SUCCESS);
             response.setResponseCode(Contants.OK_200);
         }else{
-            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            response.setResponseCode(Contants.NOT_FOUND_404);
             errorMap.put(Contants.ERROR,"No cart found");
             response.setErrorMap(errorMap);
             response.setResponseDesc(Contants.FALIURE);
@@ -144,7 +147,7 @@ public class userLogicImplementation implements userLogic{
             });
         });
         if(!shoppingcartoptional.isPresent()){
-            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            response.setResponseCode(Contants.NOT_FOUND_404);
             errorMap.put(Contants.ERROR,"No product in cart");
             response.setErrorMap(errorMap);
             response.setResponseDesc(Contants.FALIURE);
@@ -174,8 +177,13 @@ public class userLogicImplementation implements userLogic{
                             totalbeforediscount += productModel.getProduct_real_price();
                         }
                         float total = totalbeforediscount;
-                        if (cart.isCouponUsed())
-                            total = total * (cart.getCouponsModel().getCouponDiscount() / 100F);
+                        if (cart.isCouponUsed()) {
+
+//                            if (total * (cart.getCouponsModel().getCouponDiscount() / 100F) < coupon.getMaximumDiscount()) {
+                                total = total - (total * (cart.getCouponsModel().getCouponDiscount() / 100F));
+//                            }
+//                            total = cart.getCouponsModel().getMaximumDiscount();
+                        }
                         cart.setTotal(total);
                         cart.setTotalAmountBeforeDiscount(totalbeforediscount);
 
@@ -187,7 +195,7 @@ public class userLogicImplementation implements userLogic{
                 }
             });
         }else{
-            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            response.setResponseCode(Contants.NOT_FOUND_404);
             errorMap.put(Contants.ERROR,"No coupon found");
             response.setErrorMap(errorMap);
             response.setResponseDesc(Contants.FALIURE);
@@ -195,7 +203,7 @@ public class userLogicImplementation implements userLogic{
         }
 
         if(!shoppingCartModel.isPresent()){
-            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            response.setResponseCode(Contants.NOT_FOUND_404);
             errorMap.put(Contants.ERROR,"No cart found");
             response.setErrorMap(errorMap);
             response.setResponseDesc(Contants.FALIURE);
@@ -210,7 +218,7 @@ public class userLogicImplementation implements userLogic{
         Response<CouponsModel> response = new Response<CouponsModel>();
         Map<String,String> errorMap = new HashMap<>();
         if(couponsModelList == null){
-            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            response.setResponseCode(Contants.NOT_FOUND_404);
             errorMap.put(Contants.ERROR,"No product found");
             response.setErrorMap(errorMap);
             response.setResponseDesc(Contants.FALIURE);
@@ -241,7 +249,7 @@ public class userLogicImplementation implements userLogic{
         });
 
         if(!cartById.isPresent()){
-            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            response.setResponseCode(Contants.NOT_FOUND_404);
             errorMap.put(Contants.ERROR,"No cart found");
             response.setErrorMap(errorMap);
             response.setResponseDesc(Contants.FALIURE);
@@ -257,7 +265,7 @@ public class userLogicImplementation implements userLogic{
         List<UserModel> userModelList = new ArrayList<>();
         UserModel user =  userRepository.findByEmail(email);
         if(user == null){
-            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            response.setResponseCode(Contants.NOT_FOUND_404);
             errorMap.put(Contants.ERROR,"No user found");
             response.setErrorMap(errorMap);
             response.setResponseDesc(Contants.FALIURE);
@@ -290,6 +298,7 @@ public class userLogicImplementation implements userLogic{
                     userModel.setUser_Password(user.getUser_Password());
                     userModel.setOrderModels(user.getOrderModels());
                     userModel.setWishlistModel(user.getWishlistModel());
+
                     userRepository.save(userModel);
                     userModelList.add(userModel);
                     response.setResponseWrapper(userModelList);
@@ -323,7 +332,7 @@ public class userLogicImplementation implements userLogic{
         UserModel user = userRepository.findByEmail(email);
 
         if(user == null){
-            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            response.setResponseCode(Contants.NOT_FOUND_404);
             errorMap.put(Contants.ERROR,"No user found");
             response.setErrorMap(errorMap);
             response.setResponseDesc(Contants.FALIURE);
@@ -341,6 +350,7 @@ public class userLogicImplementation implements userLogic{
             cart.getProductModelList().forEach(product -> {
                 order.getProductModelList().add(product);
             });
+            //TODO : add coupon name in order field
             order.setRazorpay_order_id(cart.getRazorpay_order_id());
             orderRepository.save(order);
             shoppingCartRepository.deleteById(cart.getShoppingCartId());
@@ -367,7 +377,7 @@ public class userLogicImplementation implements userLogic{
 
         UserModel user = userRepository.findByEmail(email);
         if(user == null){
-            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            response.setResponseCode(Contants.NOT_FOUND_404);
             errorMap.put(Contants.ERROR,"No user found");
             response.setErrorMap(errorMap);
             response.setResponseDesc(Contants.FALIURE);
@@ -395,7 +405,7 @@ public class userLogicImplementation implements userLogic{
             response.setResponseDesc(Contants.SUCCESS);
             response.setResponseCode(Contants.OK_200);
         }else{
-            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            response.setResponseCode(Contants.NOT_FOUND_404);
             errorMap.put(Contants.ERROR,"No order found");
             response.setErrorMap(errorMap);
             response.setResponseDesc(Contants.FALIURE);
@@ -405,16 +415,40 @@ public class userLogicImplementation implements userLogic{
 
     @Override
     public Response<ProductModel> getAllProducts(String orderBy,String limit) {
-
         List<ProductModel> productModelList = null;
-//        if(limit != Contants.NO_LIMIT){
-//            productModelList = productRepository.findByLimit(Integer.valueOf(limit));
-//        }
-        if(orderBy == null) {
-             productModelList = productRepository.findAll();
+        if(Integer.parseInt(limit) == 0) {
+            if (orderBy == null) {
+                productModelList = productRepository.findAll();
+            } else {
+                if (orderBy.equals(Contants.DESCENDING)) {
+                    productModelList = productRepository.findInOrderDESC();
+                } else if (orderBy.equals(Contants.ASCENDING)) {
+                    //make for ascending in future
+                } else {
+                    productModelList = productRepository.findAll();
+                }
+            }
         }else{
-            productModelList = productRepository.findInOrder();
+            if(orderBy == null) {
+                Pageable pageable = PageRequest.of(0, Integer.parseInt(limit));
+                Slice<ProductModel> productModelSlice = productRepository.findProductsByLimit(pageable);
+                productModelList = productModelSlice.getContent();
+            }else if(orderBy.equals(Contants.DESCENDING)){
+                Pageable pageable = PageRequest.of(0, Integer.parseInt(limit),Sort.by("updateDate").descending());
+                Slice<ProductModel> productModelSlice = productRepository.findProductsByLimit(pageable);
+                System.out.println("Product slice : "+productModelSlice.getContent());
+                productModelList = productModelSlice.getContent();
+            }else if(orderBy.equals(Contants.ASCENDING)){
+                Pageable pageable = PageRequest.of(0, Integer.parseInt(limit),Sort.by("updateDate").ascending());
+                Slice<ProductModel> productModelSlice = productRepository.findProductsByLimit(pageable);
+                productModelList = productModelSlice.getContent();
+            }else{
+                Pageable pageable = PageRequest.of(1, Integer.parseInt(limit));
+                Slice<ProductModel> productModelSlice = productRepository.findProductsByLimit(pageable);
+                productModelList = productModelSlice.getContent();
+            }
         }
+
         Response<ProductModel> response = new Response<ProductModel>();
         Map<String,String> errorMap = new HashMap<>();
 
@@ -439,7 +473,7 @@ public class userLogicImplementation implements userLogic{
         List<ProductModel> productModelList = new ArrayList<>();
         ProductModel product = productRepository.findById(product_id).orElse(null);
         if(product == null){
-            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            response.setResponseCode(Contants.NOT_FOUND_404);
             errorMap.put(Contants.ERROR,"No product found");
             response.setErrorMap(errorMap);
             response.setResponseDesc(Contants.FALIURE);
@@ -458,7 +492,7 @@ public class userLogicImplementation implements userLogic{
         Map<String,String> errorMap = new HashMap<>();
         List<ProductModel> productModelList = productRepository.findByCategoryId(category_id);
         if(productModelList == null){
-            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            response.setResponseCode(Contants.NOT_FOUND_404);
             errorMap.put(Contants.ERROR,"No product found");
             response.setErrorMap(errorMap);
             response.setResponseDesc(Contants.FALIURE);
@@ -478,7 +512,7 @@ public class userLogicImplementation implements userLogic{
 
         UserModel user = userRepository.findByEmail(email);
         if(user == null){
-            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            response.setResponseCode(Contants.NOT_FOUND_404);
             errorMap.put(Contants.ERROR,"No user found");
             response.setErrorMap(errorMap);
             response.setResponseDesc(Contants.FALIURE);
@@ -506,7 +540,7 @@ public class userLogicImplementation implements userLogic{
             response.setResponseCode(Contants.OK_200);
         });
         if(!productModelOptional.isPresent()){
-            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            response.setResponseCode(Contants.NOT_FOUND_404);
             errorMap.put(Contants.ERROR,"No product found");
             response.setErrorMap(errorMap);
             response.setResponseDesc(Contants.FALIURE);
@@ -521,7 +555,7 @@ public class userLogicImplementation implements userLogic{
         Map<String,String> errorMap = new HashMap<>();
         UserModel user = userRepository.findByEmail(email);
         if(user == null){
-            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            response.setResponseCode(Contants.NOT_FOUND_404);
             errorMap.put(Contants.ERROR,"No user found");
             response.setErrorMap(errorMap);
             response.setResponseDesc(Contants.FALIURE);
@@ -536,7 +570,7 @@ public class userLogicImplementation implements userLogic{
             response.setResponseDesc(Contants.SUCCESS);
             response.setResponseCode(Contants.OK_200);
         }else{
-            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            response.setResponseCode(Contants.NOT_FOUND_404);
             errorMap.put(Contants.ERROR,"No wishlist found");
             response.setErrorMap(errorMap);
             response.setResponseDesc(Contants.FALIURE);
@@ -562,7 +596,7 @@ public class userLogicImplementation implements userLogic{
         });
 
         if(!wishlistModelOptional.isPresent()){
-            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            response.setResponseCode(Contants.NOT_FOUND_404);
             errorMap.put(Contants.ERROR,"No product found in wishlist");
             response.setErrorMap(errorMap);
             response.setResponseDesc(Contants.FALIURE);
@@ -576,7 +610,7 @@ public class userLogicImplementation implements userLogic{
         Map<String,String> errorMap = new HashMap<>();
         List<CategoryModel> categoryModelList = categoriesRepository.findAll();
         if(categoryModelList == null){
-            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            response.setResponseCode(Contants.NOT_FOUND_404);
             errorMap.put(Contants.ERROR,"No Category found");
             response.setErrorMap(errorMap);
             response.setResponseDesc(Contants.FALIURE);
@@ -585,6 +619,27 @@ public class userLogicImplementation implements userLogic{
         response.setResponseWrapper(categoryModelList);
         response.setResponseDesc(Contants.SUCCESS);
         response.setResponseCode(Contants.OK_200);
+        return response;
+    }
+
+    @Override
+    public Response<ProductModel> searchProducts(String productName) {
+        Response<ProductModel> response = new Response<ProductModel>();
+        Map<String,String> errorMap = new HashMap<>();
+
+        System.out.println("PRODUCT NAME : "+ productName);
+        List<ProductModel> productModelList = productRepository.findProductsBySearch("%"+productName+"%");
+        if(productModelList.size() > 0){
+            response.setResponseWrapper(productModelList);
+            response.setResponseCode(Contants.OK_200);
+            response.setResponseDesc(Contants.SUCCESS);
+        }else{
+            errorMap.put(Contants.ERROR,Contants.NOT_FOUND_404);
+            response.setErrorMap(errorMap);
+            response.setResponseWrapper(null);
+            response.setResponseCode(Contants.NOT_FOUND_404);
+            response.setResponseDesc(Contants.FALIURE);
+        }
         return response;
     }
 

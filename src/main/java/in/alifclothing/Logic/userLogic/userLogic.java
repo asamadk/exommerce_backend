@@ -43,4 +43,6 @@ public interface userLogic {
     Response<String> deleteProductFromWishlist(Integer product_id,Integer wishlist_id);
 
     Response<CategoryModel> getAllCategories();
+
+    Response<ProductModel> searchProducts(String productName);
 }
