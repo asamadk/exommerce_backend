@@ -138,7 +138,7 @@ public class userLogicImplementation implements userLogic{
                 shoppingCartModel.setCouponsModel(null);
                 shoppingCartModel.setCouponUsed(false);
                 shoppingCartModel.setTotalAmountBeforeDiscount(shoppingCartModel.getTotalAmountBeforeDiscount() - productModel.getProduct_real_price());
-                shoppingCartModel.setTotal(0F);
+                shoppingCartModel.setTotal(shoppingCartModel.getTotal() - productModel.getProduct_price());
                 if(shoppingCartModel.getProductModelList().isEmpty())shoppingCartModel.setTotalAmountBeforeDiscount(0F);
                 shoppingCartRepository.save(shoppingCartModel);
                 response.setResponseWrapper(Arrays.asList("Product Deleted"));
@@ -443,7 +443,7 @@ public class userLogicImplementation implements userLogic{
                 Slice<ProductModel> productModelSlice = productRepository.findProductsByLimit(pageable);
                 productModelList = productModelSlice.getContent();
             }else{
-                Pageable pageable = PageRequest.of(1, Integer.parseInt(limit));
+                Pageable pageable = PageRequest.of(0, Integer.parseInt(limit));
                 Slice<ProductModel> productModelSlice = productRepository.findProductsByLimit(pageable);
                 productModelList = productModelSlice.getContent();
             }
