@@ -20,10 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
+import java.util.*;
 
 //client sends the credentials
 //this class will verify user credentials
@@ -73,7 +70,13 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
         response.addHeader("Authorization","Bearer " + token);
         Response<String> tokenResponse = new Response<>();
         tokenResponse.setResponseCode(Contants.OK_200);
-        tokenResponse.setResponseWrapper(new ArrayList<>(Collections.singletonList(token)));
+        List<String> wrapper = new ArrayList<>();
+        wrapper.add(token);
+        authResult.getAuthorities().forEach(authroity -> {
+            wrapper.add(authroity.toString());
+        });
+//        tokenResponse.setResponseWrapper(new ArrayList<>(Collections.singletonList(token)));
+        tokenResponse.setResponseWrapper(wrapper);
         tokenResponse.setResponseDesc(Contants.SUCCESS);
 
         String json = new Gson().toJson(tokenResponse);

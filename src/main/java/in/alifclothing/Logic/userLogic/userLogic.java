@@ -1,5 +1,6 @@
 package in.alifclothing.Logic.userLogic;
 
+import in.alifclothing.Dto.ChangePasswordRequest;
 import in.alifclothing.Dto.Response;
 import in.alifclothing.model.*;
 
@@ -45,4 +46,8 @@ public interface userLogic {
     Response<CategoryModel> getAllCategories();
 
     Response<ProductModel> searchProducts(String productName);
+
+    Response<String> returnOrder(Integer orderId);
+
+    Response<String> changePassword(ChangePasswordRequest changePasswordModel,String userEmail);
 }

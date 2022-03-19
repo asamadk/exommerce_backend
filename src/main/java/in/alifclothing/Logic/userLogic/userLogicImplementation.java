@@ -1,15 +1,18 @@
 package in.alifclothing.Logic.userLogic;
 
+import in.alifclothing.Dto.ChangePasswordRequest;
 import in.alifclothing.Dto.Response;
 import in.alifclothing.Helper.Contants;
 import in.alifclothing.PersistanceRepository.*;
 import in.alifclothing.model.*;
 import org.aspectj.weaver.ast.Or;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -32,6 +35,10 @@ public class userLogicImplementation implements userLogic{
     private WishlistRepository wishlistRepository;
     @Autowired
     private CategoriesRepository categoriesRepository;
+    @Autowired
+    private OrderStatusRepository orderStatusRepository;
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override
     public Response<ShoppingCartModel> addProductToCart(Integer product_id, String email) {
@@ -60,9 +67,11 @@ public class userLogicImplementation implements userLogic{
                 shoppingCartModel.getProductModelList().add(productModel);
                 shoppingCartModel.setCouponsModel(null);
                 shoppingCartModel.setCouponUsed(false);
-                float total = shoppingCartModel.getTotalAmountBeforeDiscount();
+                float totalBeforeDescount = shoppingCartModel.getTotalAmountBeforeDiscount();
+                totalBeforeDescount = totalBeforeDescount + productModel.getProduct_price();
+                float total = shoppingCartModel.getTotal();
                 total = total + productModel.getProduct_real_price();
-                shoppingCartModel.setTotalAmountBeforeDiscount(total);
+                shoppingCartModel.setTotalAmountBeforeDiscount(totalBeforeDescount);
                 shoppingCartModel.setTotal(total);
                 shoppingCartRepository.save(shoppingCartModel);
                 shoppingCartModel.setShoppingCartDate(new java.sql.Date(time));
@@ -72,7 +81,7 @@ public class userLogicImplementation implements userLogic{
                 List<ProductModel> productModelList = new ArrayList<>();
                 productModelList.add(productModel);
                 shoppingCartModel.setProductModelList(productModelList);
-                shoppingCartModel.setTotalAmountBeforeDiscount(productModel.getProduct_real_price());
+                shoppingCartModel.setTotalAmountBeforeDiscount(productModel.getProduct_price());
                 shoppingCartModel.setTotal(productModel.getProduct_real_price());
                 shoppingCartModel.setShoppingCartDate(new java.sql.Date(time));
                 shoppingCartRepository.save(shoppingCartModel);
@@ -137,9 +146,12 @@ public class userLogicImplementation implements userLogic{
                 shoppingCartModel.getProductModelList().remove(productModel);
                 shoppingCartModel.setCouponsModel(null);
                 shoppingCartModel.setCouponUsed(false);
-                shoppingCartModel.setTotalAmountBeforeDiscount(shoppingCartModel.getTotalAmountBeforeDiscount() - productModel.getProduct_real_price());
-                shoppingCartModel.setTotal(shoppingCartModel.getTotal() - productModel.getProduct_price());
-                if(shoppingCartModel.getProductModelList().isEmpty())shoppingCartModel.setTotalAmountBeforeDiscount(0F);
+                shoppingCartModel.setTotalAmountBeforeDiscount(shoppingCartModel.getTotalAmountBeforeDiscount() - productModel.getProduct_price());
+                shoppingCartModel.setTotal(shoppingCartModel.getTotal() - productModel.getProduct_real_price());
+                if(shoppingCartModel.getProductModelList().isEmpty()){
+                    shoppingCartModel.setTotalAmountBeforeDiscount(0F);
+                    shoppingCartModel.setTotal(0F);
+                }
                 shoppingCartRepository.save(shoppingCartModel);
                 response.setResponseWrapper(Arrays.asList("Product Deleted"));
                 response.setResponseDesc(Contants.SUCCESS);
@@ -173,12 +185,13 @@ public class userLogicImplementation implements userLogic{
 
                         List<ProductModel> productModelList = cart.getProductModelList();
                         float totalbeforediscount = 0;
+                        float total = 0;
                         for (ProductModel productModel : productModelList) {
-                            totalbeforediscount += productModel.getProduct_real_price();
+                            totalbeforediscount += productModel.getProduct_price();
+                            total += productModel.getProduct_real_price();
                         }
-                        float total = totalbeforediscount;
+//                        float total = totalbeforediscount;
                         if (cart.isCouponUsed()) {
-
 //                            if (total * (cart.getCouponsModel().getCouponDiscount() / 100F) < coupon.getMaximumDiscount()) {
                                 total = total - (total * (cart.getCouponsModel().getCouponDiscount() / 100F));
 //                            }
@@ -640,6 +653,70 @@ public class userLogicImplementation implements userLogic{
             response.setResponseCode(Contants.NOT_FOUND_404);
             response.setResponseDesc(Contants.FALIURE);
         }
+        return response;
+    }
+
+    @Override
+    public Response<String> returnOrder(Integer orderId) {
+        Response<String> response = new Response<>();
+        Map<String,String> errorMap = new HashMap<>();
+
+        Optional<OrderModel> orderModelOptional = orderRepository.findById(orderId);
+        Optional<OrderStatus> orderStatusOptional = orderStatusRepository.findByStatusName(Contants.ORDER_STATUS_RETURN);
+        orderModelOptional.ifPresent(order -> {
+           orderStatusOptional.ifPresent(status -> {
+               order.setOrderStatus(status);
+               response.setResponseWrapper(Arrays.asList(Contants.ORDER_RETURN));
+               response.setResponseCode(Contants.OK_200);
+               response.setResponseDesc(Contants.SUCCESS);
+           });
+        });
+
+        if(!orderModelOptional.isPresent() || !orderStatusOptional.isPresent()){
+            errorMap.put(Contants.ERROR,"Not found");
+            response.setErrorMap(errorMap);
+            response.setResponseCode(Contants.NOT_FOUND_404);
+            response.setResponseDesc("Not found");
+        }
+        return response;
+    }
+
+    @Override
+    public Response<String> changePassword(ChangePasswordRequest changePasswordRequest,String userEmail) {
+        Response<String> response = new Response<>();
+        Map<String,String> errorMap = new HashMap<>();
+
+        UserModel user =  userRepository.findByEmail(userEmail);
+        if(user != null) {
+            if (changePasswordRequest != null) {
+                if (changePasswordRequest.getCurrentPassword() != null && changePasswordRequest.getNewPassword() != null) {
+                    if(bCryptPasswordEncoder.matches(changePasswordRequest.getCurrentPassword(),user.getUser_Password())){
+                        String encodedPassword = bCryptPasswordEncoder.encode(changePasswordRequest.getNewPassword());
+                        user.setUser_Password(encodedPassword);
+                        userRepository.save(user);
+                        response.setResponseDesc(Contants.SUCCESS);
+                        response.setResponseCode(Contants.OK_200);
+                        response.setResponseWrapper(Arrays.asList("Password changed succesfully, Please login again"));
+                    }else{
+                        errorMap.put(Contants.ERROR, "Old password does not match");
+                        response.setErrorMap(errorMap);
+                        response.setResponseCode(Contants.NOT_FOUND_404);
+                        response.setResponseDesc(Contants.FALIURE);
+                    }
+                }
+            } else {
+                errorMap.put(Contants.ERROR, "Empty DTO");
+                response.setErrorMap(errorMap);
+                response.setResponseCode(Contants.NOT_FOUND_404);
+                response.setResponseDesc(Contants.FALIURE);
+            }
+        }else{
+            errorMap.put(Contants.ERROR, "User not found");
+            response.setErrorMap(errorMap);
+            response.setResponseCode(Contants.NOT_FOUND_404);
+            response.setResponseDesc(Contants.FALIURE);
+        }
+
         return response;
     }
 

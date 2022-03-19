@@ -1,5 +1,6 @@
 package in.alifclothing.Controllers.User;
 
+import in.alifclothing.Dto.ChangePasswordRequest;
 import in.alifclothing.Dto.Response;
 import in.alifclothing.Helper.Contants;
 import in.alifclothing.Logic.userLogic.userLogic;
@@ -273,5 +274,32 @@ public class UserController {
     }
     //TODO Payments
 
+    @PostMapping("/order/return")
+    public ResponseEntity<Response<String>> returnOrder(@RequestParam("order_id") String orderId){
+        Response<String> response = userLogic.returnOrder(Integer.parseInt(orderId));
+        if(response.getErrorMap() == null){
+            return new ResponseEntity<Response<String>>(response,HttpStatus.OK);
+        }else{
+            if(response.getResponseCode().equals(Contants.NOT_FOUND_404)){
+                return new ResponseEntity<Response<String>>(response,HttpStatus.NOT_FOUND);
+            }
+        }
+
+        return new ResponseEntity<Response<String>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @PostMapping("/password")
+    public ResponseEntity<Response<String>> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest,Principal principal){
+        Response<String> response = userLogic.changePassword(changePasswordRequest,principal.getName());
+        if(response.getErrorMap() == null){
+            return new ResponseEntity<Response<String>>(response,HttpStatus.OK);
+        }else{
+            if(response.getResponseCode().equals(Contants.NOT_FOUND_404)){
+                return new ResponseEntity<Response<String>>(response,HttpStatus.NOT_FOUND);
+            }
+        }
+
+        return new ResponseEntity<Response<String>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
 }

@@ -141,7 +141,7 @@ public class homeController {
     }
 
     @PostMapping("/resetPassword")
-    public ResponseEntity<Response<?>> processForgotPassword(@RequestPart("email") String email, HttpServletRequest request) throws NotFoundException {
+    public ResponseEntity<Response<?>> processForgotPassword(@RequestParam("email") String email, HttpServletRequest request) throws NotFoundException {
 
         String token = RandomString.make(45);
         Response<?> response = homeLogic.updateResetPassword(token,email);
@@ -152,6 +152,8 @@ public class homeController {
                 String passwordResetLink = siteURL+"/reset_password?token="+token;
                 homeLogic.sendEmail(email,passwordResetLink);
                 return new ResponseEntity<Response<?>>(response, HttpStatus.OK);
+            }else if(response.getResponseCode().equals(Contants.NOT_FOUND_404)){
+                return new ResponseEntity<Response<?>>(response, HttpStatus.NOT_FOUND);
             }
 
         }catch (MessagingException | UnsupportedEncodingException e) {
@@ -176,9 +178,9 @@ public class homeController {
         if(response.getErrorMap() == null){
             return new ResponseEntity<Response<String>>(response,HttpStatus.OK);
         }else{
-            if(response.getResponseCode() == Contants.NOT_FOUND_404) {
+            if(response.getResponseCode().equals(Contants.NOT_FOUND_404)) {
                 return new ResponseEntity<Response<String>>(response, HttpStatus.NOT_FOUND);
-            }else if(response.getResponseCode() == Contants.CLIENT_400){
+            }else if(response.getResponseCode().equals(Contants.CLIENT_400)){
                 return new ResponseEntity<Response<String>>(response,HttpStatus.UNAUTHORIZED);
             }
         }

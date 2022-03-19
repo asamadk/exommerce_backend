@@ -10,8 +10,15 @@ public class Contants {
     public static final String ERROR = "Error";
     public static final String UNAUTH_TOKEN = "Token is not correct";
 
+    public static final String SOMETHING_WENT_WRONG = "Something went wrong";
+
     public static final String NO_LIMIT = "infi";
     public static final String DESCENDING = "DESC";
     public static final String ASCENDING = "ASC";
 
+    public static final String ORDER_STATUS_RETURN = "return";
+    public static final String ORDER_RETURN = "Order placed for return";
+
+    public static final String CURRENT_PASSWORD = "cpoz";
+    public static final String NEW_PASSWORD = "npoz";
 }

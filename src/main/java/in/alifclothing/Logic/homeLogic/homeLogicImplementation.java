@@ -79,7 +79,7 @@ public class homeLogicImplementation implements homeLogic {
             userModel.setResetPasswordToken(token);
             userRepository.save(userModel);
         }else{
-            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            response.setResponseCode(Contants.NOT_FOUND_404);
             response.setResponseDesc(Contants.FALIURE);
             errorMap.put(Contants.ERROR,"Not able to find the email address");
             response.setErrorMap(errorMap);
@@ -103,13 +103,13 @@ public class homeLogicImplementation implements homeLogic {
     public void sendEmail(String email, String resetPasswordLink) throws MessagingException, UnsupportedEncodingException {
         MimeMessage message = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message);
-        helper.setFrom("abdul.samadkirmani.samad63@gmail.com","Alif Support");
+        helper.setFrom("samad@alifclothing.in","Alif Support");
         helper.setTo(email);
         String subject = "Password reset link";
         String content = "<p>Hello,</p>"
                 +"<p>You have requested to reset your password</p>"
                 +"<p>If it was not you contact Alif support immediately</p>"
-                +"<p>Click the link below to change your password</p>"
+                +"<p>Please paste the link in the app to change your password</p>"
                 +"<p><b><a href=\""+ resetPasswordLink +"\">Change my password</a></b><p>";
         helper.setSubject(subject);
         helper.setText(content,true);
