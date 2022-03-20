@@ -1,24 +1,16 @@
 package in.alifclothing.Controllers.User;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
 import com.paytm.pg.merchant.PaytmChecksum;
 
 import in.alifclothing.Dto.PaytmCustom;
-import in.alifclothing.Dto.Response;
 import in.alifclothing.Helper.Contants;
 import in.alifclothing.PersistanceRepository.OrderRepository;
 import in.alifclothing.PersistanceRepository.ShoppingCartRepository;
 import in.alifclothing.PersistanceRepository.UserRepository;
 import in.alifclothing.model.OrderModel;
-import org.apache.tomcat.util.json.JSONParser;
 import org.json.JSONObject;
-import org.json.JSONString;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.razorpay.RazorpayClient;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
@@ -26,10 +18,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.Principal;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
