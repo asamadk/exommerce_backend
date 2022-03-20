@@ -21,4 +21,8 @@ public class Contants {
 
     public static final String CURRENT_PASSWORD = "cpoz";
     public static final String NEW_PASSWORD = "npoz";
+
+    public static final String CREDIT_CARD_PAYMENT = "CREDIT_CARD";
+    public static final String DEBIT_CARD_PAYMENT = "DEBIT_CARD";
+    public static final String UPI_PAYMENT = "UPI";
 }

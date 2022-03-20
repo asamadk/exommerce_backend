@@ -23,6 +23,7 @@ public class OrderModel {
     private OrderStatus orderStatus;
     private String razorpay_order_id;
     private String couponName;
+    private String paymentMode;
 
     public OrderModel(UserModel userModel, List<ProductModel> productModelList,
                       float price, Date orderDate, String orderTrackingNumber,
@@ -46,6 +47,19 @@ public class OrderModel {
         this.orderStatus = orderStatus;
         this.razorpay_order_id = razorpay_order_id;
         this.couponName = couponName;
+    }
+
+    public OrderModel(int orderId, UserModel userModel, List<ProductModel> productModelList, float price, Date orderDate, String orderTrackingNumber, OrderStatus orderStatus, String razorpay_order_id, String couponName, String paymentMode) {
+        OrderId = orderId;
+        this.userModel = userModel;
+        this.productModelList = productModelList;
+        this.price = price;
+        this.orderDate = orderDate;
+        this.orderTrackingNumber = orderTrackingNumber;
+        this.orderStatus = orderStatus;
+        this.razorpay_order_id = razorpay_order_id;
+        this.couponName = couponName;
+        this.paymentMode = paymentMode;
     }
 
     public OrderModel() {
@@ -122,5 +136,13 @@ public class OrderModel {
 
     public void setCouponName(String couponName) {
         this.couponName = couponName;
+    }
+
+    public String getPaymentMode() {
+        return paymentMode;
+    }
+
+    public void setPaymentMode(String paymentMode) {
+        this.paymentMode = paymentMode;
     }
 }
