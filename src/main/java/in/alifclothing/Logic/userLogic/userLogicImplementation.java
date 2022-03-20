@@ -338,9 +338,9 @@ public class userLogicImplementation implements userLogic{
     }
 
     @Override
-    public Response<String> createOrderFromCart(String email) {
+    public Response<OrderModel> createOrderFromCart(String email) {
 
-        Response<String> response = new Response<>();
+        Response<OrderModel> response = new Response<>();
         Map<String,String> errorMap = new HashMap<>();
         UserModel user = userRepository.findByEmail(email);
 
@@ -367,14 +367,16 @@ public class userLogicImplementation implements userLogic{
             order.setRazorpay_order_id(cart.getRazorpay_order_id());
             orderRepository.save(order);
             shoppingCartRepository.deleteById(cart.getShoppingCartId());
-            response.setResponseWrapper(Arrays.asList("Order Created"));
+            List<OrderModel> orderModelList = new ArrayList<>();
+            orderModelList.add(order);
+            response.setResponseWrapper(orderModelList);
             response.setResponseDesc(Contants.SUCCESS);
             response.setResponseCode(Contants.OK_200);
             //TODO tracking number and order status
         });
 
         if(!shoppingCartModel.isPresent()){
-            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            response.setResponseCode(Contants.NOT_FOUND_404);
             errorMap.put(Contants.ERROR,"Shopping cart is empty");
             response.setErrorMap(errorMap);
             response.setResponseDesc(Contants.FALIURE);

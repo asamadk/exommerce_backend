@@ -184,18 +184,18 @@ public class UserController {
 
 
     @PostMapping("/order")
-    public ResponseEntity<Response<String>> createOrder(Principal principal){
+    public ResponseEntity<Response<OrderModel>> createOrder(Principal principal){
 
-        Response<String> response = userLogic.createOrderFromCart(principal.getName());
+        Response<OrderModel> response = userLogic.createOrderFromCart(principal.getName());
         if(response.getErrorMap() == null){
-            return new ResponseEntity<Response<String>>(response,HttpStatus.OK);
+            return new ResponseEntity<Response<OrderModel>>(response,HttpStatus.OK);
         }else{
             if(response.getResponseCode().equals(Contants.NOT_FOUND_404)){
-                return new ResponseEntity<Response<String>>(response,HttpStatus.NOT_FOUND);
+                return new ResponseEntity<Response<OrderModel>>(response,HttpStatus.NOT_FOUND);
             }
         }
 
-        return new ResponseEntity<Response<String>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<Response<OrderModel>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @GetMapping("/orders")

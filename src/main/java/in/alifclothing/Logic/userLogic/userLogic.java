@@ -25,7 +25,7 @@ public interface userLogic {
 
     Response<UserModel> updateCurrentUser(UserModel userModel,Integer uid);
 
-    Response<String> createOrderFromCart(String email);
+    Response<OrderModel> createOrderFromCart(String email);
 
     Response<OrderModel> getAllOrdersOfUser(String email);
 
