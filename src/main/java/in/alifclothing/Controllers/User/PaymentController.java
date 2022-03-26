@@ -3,6 +3,7 @@ package in.alifclothing.Controllers.User;
 import com.paytm.pg.merchant.PaytmChecksum;
 
 import in.alifclothing.Dto.PaytmCustom;
+import in.alifclothing.Dto.Response;
 import in.alifclothing.Helper.Contants;
 import in.alifclothing.PersistanceRepository.OrderRepository;
 import in.alifclothing.PersistanceRepository.ShoppingCartRepository;
@@ -10,6 +11,8 @@ import in.alifclothing.PersistanceRepository.UserRepository;
 import in.alifclothing.model.OrderModel;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -18,6 +21,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.Principal;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 
 @CrossOrigin(origins = "http://localhost:3000")
@@ -37,7 +43,10 @@ public class PaymentController {
 
     //run create order controller and when successfull run this function and send response
     @PostMapping("/payment")
-    public void initiateTransaction(@RequestBody() OrderModel orderModel, Principal principal, HttpServletResponse response) throws Exception {
+    public ResponseEntity<Response<String>> initiateTransaction(@RequestBody() OrderModel orderModel, Principal principal, HttpServletResponse response) throws Exception {
+
+        Response<String> customResponse = new Response<>();
+        Map<String,String> errorMap = new HashMap<>();
 
         JSONObject paytmParams = new JSONObject();
         JSONObject body = new JSONObject();
@@ -80,16 +89,28 @@ public class PaymentController {
             BufferedReader responseReader = new BufferedReader(new InputStreamReader(is));
             if ((responseData = responseReader.readLine()) != null) {
                 System.out.append("Response: " + responseData);
-                PrintWriter out = response.getWriter();
-                response.setContentType("application/json");
-                response.setCharacterEncoding("UTF-8");
-                out.write(responseData);
-                out.flush();
+                customResponse.setResponseCode(Contants.OK_200);
+                customResponse.setResponseDesc(Contants.SUCCESS);
+                customResponse.setResponseWrapper(Arrays.asList(responseData));
+//                PrintWriter out = response.getWriter();
+//                response.setContentType("application/json");
+//                response.setCharacterEncoding("UTF-8");
+//                out.write(responseData);
+//                out.flush();
             }
             responseReader.close();
         }catch (Exception e){
+            errorMap.put(Contants.ERROR,e.getMessage());
+            customResponse.setResponseWrapper(null);
+            customResponse.setErrorMap(errorMap);
+            customResponse.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            customResponse.setResponseDesc(e.getLocalizedMessage());
             e.printStackTrace();
         }
+        if(customResponse.getResponseCode().equals(Contants.OK_200)) {
+            return new ResponseEntity<Response<String>>(customResponse, HttpStatus.OK);
+        }
+        return new ResponseEntity<Response<String>>(customResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @PostMapping("/payment/options")
@@ -143,6 +164,7 @@ public class PaymentController {
     public void processPayment(@RequestBody() OrderModel orderModel,
                                @RequestParam("token") String token,
                                @RequestParam("info") String info,
+                               @RequestParam("mode") String mode,
                                HttpServletResponse response
                                ) throws MalformedURLException {
         JSONObject paytmParams = new JSONObject();
@@ -152,9 +174,14 @@ public class PaymentController {
         body.put("mid", paytmCustom.getMerchantId());
         body.put("orderId", "ORDERID_"+orderModel.getOrderId());
         body.put("paymentMode", orderModel.getPaymentMode());
-        if(orderModel.getPaymentMode().equals(Contants.CREDIT_CARD_PAYMENT) || orderModel.getPaymentMode().equals(Contants.DEBIT_CARD_PAYMENT)){
+//        if(orderModel.getPaymentMode().equals(Contants.CREDIT_CARD_PAYMENT) || orderModel.getPaymentMode().equals(Contants.DEBIT_CARD_PAYMENT)){
+//            body.put("cardInfo", info);
+//        }else if(orderModel.getPaymentMode().equals(Contants.UPI_PAYMENT)){
+//            body.put("payerAccount",info);
+//        }
+        if(mode  != null && (mode.equals(Contants.CREDIT_CARD_PAYMENT) || mode.equals(Contants.DEBIT_CARD_PAYMENT))){
             body.put("cardInfo", info);
-        }else if(orderModel.getPaymentMode().equals(Contants.UPI_PAYMENT)){
+        }else if(mode != null && mode.equals(Contants.UPI_PAYMENT)){
             body.put("payerAccount",info);
         }
         body.put("authMode", "otp");

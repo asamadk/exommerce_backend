@@ -23,7 +23,7 @@ public class OrderModel {
     private OrderStatus orderStatus;
     private String razorpay_order_id;
     private String couponName;
-    private String paymentMode;
+    private String paymentMode ;
 
     public OrderModel(UserModel userModel, List<ProductModel> productModelList,
                       float price, Date orderDate, String orderTrackingNumber,
