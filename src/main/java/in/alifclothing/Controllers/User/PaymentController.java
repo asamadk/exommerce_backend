@@ -180,7 +180,9 @@ public class PaymentController {
 //            body.put("payerAccount",info);
 //        }
         if(mode  != null && (mode.equals(Contants.CREDIT_CARD_PAYMENT) || mode.equals(Contants.DEBIT_CARD_PAYMENT))){
-            body.put("cardInfo", info);
+            String[] cardDetails = info.split("x");
+            body.put("cardInfo", "|" + cardDetails[0] + "|" + cardDetails[1] + "|" + cardDetails[2]);
+//            System.out.println("HERE -> "+ "|" + cardDetails[0] + "|" + cardDetails[1] + "|" + cardDetails[2]);
         }else if(mode != null && mode.equals(Contants.UPI_PAYMENT)){
             body.put("payerAccount",info);
         }
