@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:3000", originPatterns = "https://alif-frontend.herokuapp.com/")
 @RestController
 @RequestMapping("/user")
 public class PaymentController {

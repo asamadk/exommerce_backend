@@ -14,7 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:3000")
+//@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:3000", originPatterns = "https://alif-frontend.herokuapp.com/")
 @RestController
 @RequestMapping("/user")
 public class UserController {
