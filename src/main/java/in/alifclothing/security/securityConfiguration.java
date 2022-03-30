@@ -56,7 +56,7 @@ public class securityConfiguration extends WebSecurityConfigurerAdapter {
 		//by the browser.The browser check and it doesn't allow HTTPResponse if we don't configure
 		//CORS(Cross Origin Resource Sharing) for the webservices end point.
 		//configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080",""));
-		configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000","https://alif-frontend.herokuapp.com/"));
+		configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000","https://alif-frontend.herokuapp.com/","https://master.dffhfaemxr04v.amplifyapp.com/"));
 		//configuration.setAllowedMethods(Arrays.asList("GET","PUT","POST","DELETE","OPTIONS"));
 		configuration.setAllowedMethods(Arrays.asList("*")); //We use asterik, so that all HTTP methods are allowed.
 		//If we want to allow credentials for HTTPResponse and credentials, here, are cookies and Authorization header.
