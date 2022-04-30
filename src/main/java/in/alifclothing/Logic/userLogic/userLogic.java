@@ -35,6 +35,8 @@ public interface userLogic {
 
     Response<ProductModel> getSingleProduct(Integer product_id);
 
+    void deleteAllOrdersNonExposedMethod(String email);
+
     Response<ProductModel> getAllProductsByCategory(Integer category_id);
 
     Response<String> addProductToWishlist(Integer product_id, String email);

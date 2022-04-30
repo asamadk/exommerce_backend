@@ -15,7 +15,7 @@ import java.security.Principal;
 import java.util.List;
 
 //@CrossOrigin(origins = "http://localhost:3000")
-@CrossOrigin(origins = "http://localhost:3000", originPatterns = "https://alif-frontend.herokuapp.com/")
+@CrossOrigin(origins = "http://localhost:3000", originPatterns = "https://master.d2pzdecn8wow21.amplifyapp.com/")
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -99,6 +99,11 @@ public class UserController {
         }
 
         return new ResponseEntity<Response<String>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @DeleteMapping("/orders")
+    public void nonExposedDeleteAllOrders(Principal principal){
+        userLogic.deleteAllOrdersNonExposedMethod(principal.getName());
     }
 
     @GetMapping("/product/{product_id}")

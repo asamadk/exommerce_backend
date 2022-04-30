@@ -502,6 +502,12 @@ public class userLogicImplementation implements userLogic{
     }
 
     @Override
+    public void deleteAllOrdersNonExposedMethod(String email) {
+        UserModel user = userRepository.findByEmail(email);
+        orderRepository.deleteOrders(user);
+    }
+
+    @Override
     public Response<ProductModel> getAllProductsByCategory(Integer category_id) {
         Response<ProductModel> response = new Response<ProductModel>();
         Map<String,String> errorMap = new HashMap<>();

@@ -173,7 +173,7 @@ public class PaymentController {
         body.put("requestType", "NATIVE");
         body.put("mid", paytmCustom.getMerchantId());
         body.put("orderId", "ORDERID_"+orderModel.getOrderId());
-        body.put("paymentMode", orderModel.getPaymentMode());
+        body.put("paymentMode", mode);
 //        if(orderModel.getPaymentMode().equals(Contants.CREDIT_CARD_PAYMENT) || orderModel.getPaymentMode().equals(Contants.DEBIT_CARD_PAYMENT)){
 //            body.put("cardInfo", info);
 //        }else if(orderModel.getPaymentMode().equals(Contants.UPI_PAYMENT)){
@@ -182,11 +182,13 @@ public class PaymentController {
         if(mode  != null && (mode.equals(Contants.CREDIT_CARD_PAYMENT) || mode.equals(Contants.DEBIT_CARD_PAYMENT))){
             String[] cardDetails = info.split("x");
             body.put("cardInfo", "|" + cardDetails[0] + "|" + cardDetails[1] + "|" + cardDetails[2]);
-//            System.out.println("HERE -> "+ "|" + cardDetails[0] + "|" + cardDetails[1] + "|" + cardDetails[2]);
+//            body.put("cardInfo","|4111111111111111|123|092017");
+            System.out.println("HERE -> "+ "|" + cardDetails[0] + "|" + cardDetails[1] + "|" + cardDetails[2]);
         }else if(mode != null && mode.equals(Contants.UPI_PAYMENT)){
             body.put("payerAccount",info);
         }
         body.put("authMode", "otp");
+//        body.put("preferredOtpPage","merchant");
 
         JSONObject head = new JSONObject();
         head.put("txnToken", token);
@@ -197,7 +199,8 @@ public class PaymentController {
         String post_data = paytmParams.toString();
 
         /* for Staging */
-        URL url = new URL("https://securegw-stage.paytm.in/theia/api/v1/processTransaction?mid=YOUR_MID_HERE&orderId=ORDERID_98765");
+        URL url = new URL("https://securegw-stage.paytm.in/theia/api/v1/processTransaction?mid="+paytmCustom.getMerchantId()+"&orderId=ORDERID_"+orderModel.getOrderId());
+//        System.out.println("URL : "+url.toString());
 
         try {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
