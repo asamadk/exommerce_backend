@@ -393,6 +393,7 @@ public class userLogicImplementation implements userLogic{
             errorMap.put(Contants.ERROR,"No user found");
             response.setErrorMap(errorMap);
             response.setResponseDesc(Contants.FALIURE);
+            return response;
         }
 
         List<OrderModel> orderModelList =  new ArrayList<>();
@@ -601,8 +602,12 @@ public class userLogicImplementation implements userLogic{
             return response;
         }
 
-        List<WishlistModel> wishList = wishlistRepository.findByUserId(user.getUser_id(),pageable);
-        if(wishList != null && wishList.size() > 0){
+        List<WishlistModel> wishList = new ArrayList<>();
+         Page<WishlistModel> wishlistModelPage = wishlistRepository.findByUserId(user.getUser_id(),pageable);
+         if(!wishlistModelPage.isEmpty()){
+             wishList = wishlistModelPage.toList();
+         }
+        if(wishList.size() > 0){
             response.setResponseWrapper(wishList);
             response.setResponseDesc(Contants.SUCCESS);
             response.setResponseCode(Contants.OK_200);
