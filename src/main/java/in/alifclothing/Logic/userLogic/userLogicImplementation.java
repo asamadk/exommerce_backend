@@ -8,10 +8,7 @@ import in.alifclothing.model.*;
 import org.aspectj.weaver.ast.Or;
 import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -385,7 +382,7 @@ public class userLogicImplementation implements userLogic{
     }
 
     @Override
-    public Response<OrderModel> getAllOrdersOfUser(String email) {
+    public Response<OrderModel> getAllOrdersOfUser(String email,String page,String size) {
 
         Response<OrderModel> response = new Response<>();
         Map<String,String> errorMap = new HashMap<>();
@@ -397,12 +394,21 @@ public class userLogicImplementation implements userLogic{
             response.setErrorMap(errorMap);
             response.setResponseDesc(Contants.FALIURE);
         }
-        List<OrderModel> orderModelList =  orderRepository.findByUserId(user.getUser_id());
-        if(orderModelList != null){
-            response.setResponseWrapper(orderModelList);
-            response.setResponseDesc(Contants.SUCCESS);
-            response.setResponseCode(Contants.OK_200);
+
+        List<OrderModel> orderModelList =  new ArrayList<>();
+        Pageable paging = null;
+        if(page != null && size != null){
+             paging = PageRequest.of(Integer.parseInt(page), Integer.parseInt(size));
+        }else{
+            paging = PageRequest.of(0, 10);
         }
+        Page<OrderModel> orderModelPage = orderRepository.findByUserIdPagination(user.getUser_id(),paging);
+        if(!orderModelPage.isEmpty()){
+            orderModelList = orderModelPage.toList();
+        }
+        response.setResponseWrapper(orderModelList);
+        response.setResponseDesc(Contants.SUCCESS);
+        response.setResponseCode(Contants.OK_200);
         return response;
     }
 
@@ -429,7 +435,7 @@ public class userLogicImplementation implements userLogic{
     }
 
     @Override
-    public Response<ProductModel> getAllProducts(String orderBy,String limit) {
+    public Response<ProductModel> getAllProducts(String orderBy,String page,String limit) {
         List<ProductModel> productModelList = null;
         if(Integer.parseInt(limit) == 0) {
             if (orderBy == null) {
@@ -445,20 +451,19 @@ public class userLogicImplementation implements userLogic{
             }
         }else{
             if(orderBy == null) {
-                Pageable pageable = PageRequest.of(0, Integer.parseInt(limit));
+                Pageable pageable = PageRequest.of(Integer.parseInt(page), Integer.parseInt(limit));
                 Slice<ProductModel> productModelSlice = productRepository.findProductsByLimit(pageable);
                 productModelList = productModelSlice.getContent();
             }else if(orderBy.equals(Contants.DESCENDING)){
-                Pageable pageable = PageRequest.of(0, Integer.parseInt(limit),Sort.by("updateDate").descending());
+                Pageable pageable = PageRequest.of(Integer.parseInt(page), Integer.parseInt(limit),Sort.by("updateDate").descending());
                 Slice<ProductModel> productModelSlice = productRepository.findProductsByLimit(pageable);
-                System.out.println("Product slice : "+productModelSlice.getContent());
                 productModelList = productModelSlice.getContent();
             }else if(orderBy.equals(Contants.ASCENDING)){
-                Pageable pageable = PageRequest.of(0, Integer.parseInt(limit),Sort.by("updateDate").ascending());
+                Pageable pageable = PageRequest.of(Integer.parseInt(page), Integer.parseInt(limit),Sort.by("updateDate").ascending());
                 Slice<ProductModel> productModelSlice = productRepository.findProductsByLimit(pageable);
                 productModelList = productModelSlice.getContent();
             }else{
-                Pageable pageable = PageRequest.of(0, Integer.parseInt(limit));
+                Pageable pageable = PageRequest.of(Integer.parseInt(page), Integer.parseInt(limit));
                 Slice<ProductModel> productModelSlice = productRepository.findProductsByLimit(pageable);
                 productModelList = productModelSlice.getContent();
             }
@@ -508,10 +513,16 @@ public class userLogicImplementation implements userLogic{
     }
 
     @Override
-    public Response<ProductModel> getAllProductsByCategory(Integer category_id) {
+    public Response<ProductModel> getAllProductsByCategory(Integer category_id,String page,String size) {
         Response<ProductModel> response = new Response<ProductModel>();
         Map<String,String> errorMap = new HashMap<>();
-        List<ProductModel> productModelList = productRepository.findByCategoryId(category_id);
+        Pageable pageable = null;
+        if(page != null && size != null){
+            pageable = PageRequest.of(Integer.parseInt(page),Integer.parseInt(size));
+        }else{
+            pageable = PageRequest.of(0,10);
+        }
+        List<ProductModel> productModelList = productRepository.findByCategoryIdPagable(category_id,pageable);
         if(productModelList == null){
             response.setResponseCode(Contants.NOT_FOUND_404);
             errorMap.put(Contants.ERROR,"No product found");
@@ -570,10 +581,17 @@ public class userLogicImplementation implements userLogic{
     }
 
     @Override
-    public Response<WishlistModel> getUserWishlist(String email) {
+    public Response<WishlistModel> getUserWishlist(String email,String page,String size) {
 
         Response<WishlistModel> response = new Response<>();
         Map<String,String> errorMap = new HashMap<>();
+
+        Pageable pageable = null;
+        if(page != null && size != null){
+            pageable = PageRequest.of(Integer.parseInt(page),Integer.parseInt(size));
+        }else{
+            pageable = PageRequest.of(0,10);
+        }
         UserModel user = userRepository.findByEmail(email);
         if(user == null){
             response.setResponseCode(Contants.NOT_FOUND_404);
@@ -583,11 +601,9 @@ public class userLogicImplementation implements userLogic{
             return response;
         }
 
-        List<WishlistModel> wishlistModelList = new ArrayList<>();
-        Optional<WishlistModel> wishList = wishlistRepository.findByUserId(user.getUser_id());
-        if(wishList.isPresent()){
-            wishlistModelList.add(wishList.get());
-            response.setResponseWrapper(wishlistModelList);
+        List<WishlistModel> wishList = wishlistRepository.findByUserId(user.getUser_id(),pageable);
+        if(wishList != null && wishList.size() > 0){
+            response.setResponseWrapper(wishList);
             response.setResponseDesc(Contants.SUCCESS);
             response.setResponseCode(Contants.OK_200);
         }else{

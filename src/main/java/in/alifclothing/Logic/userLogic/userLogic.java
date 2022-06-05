@@ -27,21 +27,23 @@ public interface userLogic {
 
     Response<OrderModel> createOrderFromCart(String email);
 
-    Response<OrderModel> getAllOrdersOfUser(String email);
+    Response<OrderModel> getAllOrdersOfUser(String email,String page,String size);
 
     Response<OrderModel> getSingleOrderOfUser(Integer order_id);
 
-    Response<ProductModel> getAllProducts(String orderBy,String limit);
+    Response<ProductModel> getAllProducts(String orderBy,String page,String limit);
 
     Response<ProductModel> getSingleProduct(Integer product_id);
 
     void deleteAllOrdersNonExposedMethod(String email);
 
-    Response<ProductModel> getAllProductsByCategory(Integer category_id);
+    Response<ProductModel> getAllProductsByCategory(Integer category_id,String page,String size);
+
+//    Response<ProductModel> getAllProductsByCategory(Integer category_id);
 
     Response<String> addProductToWishlist(Integer product_id, String email);
 
-    Response<WishlistModel> getUserWishlist(String email);
+    Response<WishlistModel> getUserWishlist(String email,String page,String size);
 
     Response<String> deleteProductFromWishlist(Integer product_id,Integer wishlist_id);
 

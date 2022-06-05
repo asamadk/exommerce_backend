@@ -101,10 +101,10 @@ public class UserController {
         return new ResponseEntity<Response<String>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @DeleteMapping("/orders")
-    public void nonExposedDeleteAllOrders(Principal principal){
-        userLogic.deleteAllOrdersNonExposedMethod(principal.getName());
-    }
+//    @DeleteMapping("/orders")
+//    public void nonExposedDeleteAllOrders(Principal principal){
+//        userLogic.deleteAllOrdersNonExposedMethod(principal.getName());
+//    }
 
     @GetMapping("/product/{product_id}")
     public ResponseEntity<Response<ProductModel>> getProduct(@PathVariable("product_id") Integer product_id){
@@ -121,8 +121,10 @@ public class UserController {
     }
 
     @GetMapping("/product/category/{category_id}")
-    public ResponseEntity<Response<ProductModel>> getProductsByCategory(@PathVariable("category_id") Integer category_id){
-        Response<ProductModel> response = userLogic.getAllProductsByCategory(category_id);
+    public ResponseEntity<Response<ProductModel>> getProductsByCategory(@PathVariable("category_id") Integer category_id,
+        @RequestParam("page") String page, @RequestParam("size") String size
+    ){
+        Response<ProductModel> response = userLogic.getAllProductsByCategory(category_id,page,size);
         if(response.getErrorMap() == null){
             return new ResponseEntity<Response<ProductModel>>(response,HttpStatus.OK);
         }else{
@@ -205,9 +207,8 @@ public class UserController {
     }
 
     @GetMapping("/orders")
-    public ResponseEntity<Response<OrderModel>> getOrders(Principal principal){
-
-        Response<OrderModel> response = userLogic.getAllOrdersOfUser(principal.getName());
+    public ResponseEntity<Response<OrderModel>> getOrders(Principal principal, @RequestParam("page") String page, @RequestParam("size") String size){
+        Response<OrderModel> response = userLogic.getAllOrdersOfUser(principal.getName(),page,size);
         if(response.getErrorMap() == null){
             return new ResponseEntity<Response<OrderModel>>(response,HttpStatus.OK);
         }else{
@@ -250,9 +251,9 @@ public class UserController {
     }
 
     @GetMapping("/wishlist")
-    public ResponseEntity<Response<WishlistModel>> getWishlist(Principal principal){
+    public ResponseEntity<Response<WishlistModel>> getWishlist(Principal principal,@RequestParam("page") String page, @RequestParam("size") String size){
 
-        Response<WishlistModel > response = userLogic.getUserWishlist(principal.getName());
+        Response<WishlistModel > response = userLogic.getUserWishlist(principal.getName(),page,size);
         if(response.getErrorMap() == null){
             return new ResponseEntity<Response<WishlistModel>>(response,HttpStatus.OK);
         }else{

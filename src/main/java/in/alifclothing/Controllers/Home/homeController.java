@@ -84,8 +84,9 @@ public class homeController {
 
     @GetMapping("/products")
     public ResponseEntity<Response<ProductModel>> fetchproducts(@RequestParam("order") String orderBy,
+                                                                @RequestParam("page") String page,
                                                                 @RequestParam("limit") String limit){
-        Response<ProductModel> response = userLogic.getAllProducts(orderBy,limit);
+        Response<ProductModel> response = userLogic.getAllProducts(orderBy,page,limit);
         if(response.getErrorMap() == null){
             return new ResponseEntity<Response<ProductModel>>(response,HttpStatus.OK);
         }else{
@@ -109,8 +110,10 @@ public class homeController {
     }
 
     @GetMapping("/product/category/{category_id}")
-    public ResponseEntity<Response<ProductModel>> fetchProductsByCategories(@PathVariable("category_id") Integer category_id){
-        Response<ProductModel> response = userLogic.getAllProductsByCategory(category_id);
+    public ResponseEntity<Response<ProductModel>> fetchProductsByCategories(@PathVariable("category_id") Integer category_id,
+        @RequestParam("page") String page, @RequestParam("size") String size
+    ){
+        Response<ProductModel> response = userLogic.getAllProductsByCategory(category_id,page,size);
         if(response.getErrorMap() == null){
             return new ResponseEntity<Response<ProductModel>>(response,HttpStatus.OK);
         }

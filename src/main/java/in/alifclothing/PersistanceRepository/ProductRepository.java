@@ -13,6 +13,9 @@ public interface ProductRepository extends JpaRepository<ProductModel,Integer> {
     @Query("select p from ProductModel p where p.categoryModel.category_Id=:id")
     List<ProductModel> findByCategoryId(@Param("id") Integer id);
 
+    @Query("select p from ProductModel p where p.categoryModel.category_Id=:id")
+    List<ProductModel> findByCategoryIdPagable(@Param("id") Integer id, Pageable pageable);
+
     @Query("select p from ProductModel p order by p.updateDate DESC ")
     List<ProductModel> findInOrderDESC();
 

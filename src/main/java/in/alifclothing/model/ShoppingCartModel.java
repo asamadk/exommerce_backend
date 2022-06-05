@@ -25,6 +25,8 @@ public class ShoppingCartModel {
     private CouponsModel couponsModel;
     private boolean couponUsed;
     private String razorpay_order_id;
+    private Boolean isCustom;
+    private String customSizeJSON;
 
     public ShoppingCartModel(UserModel userModel, Date shoppingCartDate,List<ProductModel> productModelList,
                              float total,CouponsModel couponsModel,boolean couponUsed, float totalAmountBeforeDiscount) {
@@ -37,6 +39,20 @@ public class ShoppingCartModel {
         this.totalAmountBeforeDiscount = totalAmountBeforeDiscount;
     }
 
+    public ShoppingCartModel(int shoppingCartId, UserModel userModel, Date shoppingCartDate, List<ProductModel> productModelList, float totalAmountBeforeDiscount, float total, CouponsModel couponsModel, boolean couponUsed, String razorpay_order_id, Boolean isCustom, String customSizeJSON) {
+        ShoppingCartId = shoppingCartId;
+        this.userModel = userModel;
+        this.shoppingCartDate = shoppingCartDate;
+        this.productModelList = productModelList;
+        this.totalAmountBeforeDiscount = totalAmountBeforeDiscount;
+        this.total = total;
+        this.couponsModel = couponsModel;
+        this.couponUsed = couponUsed;
+        this.razorpay_order_id = razorpay_order_id;
+        this.isCustom = isCustom;
+        this.customSizeJSON = customSizeJSON;
+    }
+
     public ShoppingCartModel(UserModel userModel, List<ProductModel> productModelList) {
         this.userModel = userModel;
         this.productModelList = productModelList;
@@ -44,6 +60,22 @@ public class ShoppingCartModel {
 
     public ShoppingCartModel() {
 
+    }
+
+    public Boolean getCustom() {
+        return isCustom;
+    }
+
+    public void setCustom(Boolean custom) {
+        isCustom = custom;
+    }
+
+    public String getCustomSizeJSON() {
+        return customSizeJSON;
+    }
+
+    public void setCustomSizeJSON(String customSizeJSON) {
+        this.customSizeJSON = customSizeJSON;
     }
 
     public int getShoppingCartId() {

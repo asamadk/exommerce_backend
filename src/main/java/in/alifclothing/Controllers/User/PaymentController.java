@@ -183,7 +183,7 @@ public class PaymentController {
             String[] cardDetails = info.split("x");
             body.put("cardInfo", "|" + cardDetails[0] + "|" + cardDetails[1] + "|" + cardDetails[2]);
 //            body.put("cardInfo","|4111111111111111|123|092017");
-            System.out.println("HERE -> "+ "|" + cardDetails[0] + "|" + cardDetails[1] + "|" + cardDetails[2]);
+//            System.out.println("HERE -> "+ "|" + cardDetails[0] + "|" + cardDetails[1] + "|" + cardDetails[2]);
         }else if(mode != null && mode.equals(Contants.UPI_PAYMENT)){
             body.put("payerAccount",info);
         }
