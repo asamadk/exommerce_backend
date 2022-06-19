@@ -5,6 +5,7 @@ import in.alifclothing.PersistanceRepository.UserRepository;
 import in.alifclothing.model.UserModel;
 import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.mail.javamail.JavaMailSender;
 
 import in.alifclothing.Helper.Contants;
@@ -28,6 +29,8 @@ public class homeLogicImplementation implements homeLogic {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     @Autowired
     private JavaMailSender javaMailSender;
+    @Autowired
+    private Environment evn;
 
     @Override
     public Response<?> persistUser(UserModel userModel) {
@@ -103,7 +106,7 @@ public class homeLogicImplementation implements homeLogic {
     public void sendEmail(String email, String resetPasswordLink) throws MessagingException, UnsupportedEncodingException {
         MimeMessage message = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message);
-        helper.setFrom("samad@alifclothing.in","Alif Support");
+        helper.setFrom("abdul.samadkirmani.samad63@gmail.com","Alif Support");
         helper.setTo(email);
         String subject = "Password reset link";
         String content = "<p>Hello,</p>"
@@ -152,8 +155,8 @@ public class homeLogicImplementation implements homeLogic {
         try {
             MimeMessage message = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message);
-            helper.setFrom(email, "Alif Support");
-            helper.setTo("alif@alifclothing.in");
+            helper.setFrom("abdul.samadkirmani.samad63@gmail.com", "Alif Support");
+            helper.setTo(Objects.requireNonNull(evn.getProperty("alif.mail.for.order")));
             helper.setText(String.valueOf(body), false);
             helper.setSubject(subject);
             javaMailSender.send(message);

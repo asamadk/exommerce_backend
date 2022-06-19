@@ -21,9 +21,15 @@ public class OrderModel {
     private String orderTrackingNumber;
     @ManyToOne
     private OrderStatus orderStatus;
+    private String orderStatusString;
+    private Date expectedArrivalDate;
     private String razorpay_order_id;
     private String couponName;
     private String paymentMode ;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "orderModel")
+    private List<UserProductInformation> userProductInformations;
 
     public OrderModel(UserModel userModel, List<ProductModel> productModelList,
                       float price, Date orderDate, String orderTrackingNumber,
@@ -37,6 +43,20 @@ public class OrderModel {
         this.razorpay_order_id = razorpay_order_id;
     }
 
+    public OrderModel(int orderId, UserModel userModel, List<ProductModel> productModelList, float price, Date orderDate, String orderTrackingNumber, OrderStatus orderStatus, String orderStatusString, String razorpay_order_id, String couponName, String paymentMode) {
+        OrderId = orderId;
+        this.userModel = userModel;
+        this.productModelList = productModelList;
+        this.price = price;
+        this.orderDate = orderDate;
+        this.orderTrackingNumber = orderTrackingNumber;
+        this.orderStatus = orderStatus;
+        this.orderStatusString = orderStatusString;
+        this.razorpay_order_id = razorpay_order_id;
+        this.couponName = couponName;
+        this.paymentMode = paymentMode;
+    }
+
     public OrderModel(int orderId, UserModel userModel, List<ProductModel> productModelList, float price, Date orderDate, String orderTrackingNumber, OrderStatus orderStatus, String razorpay_order_id, String couponName) {
         OrderId = orderId;
         this.userModel = userModel;
@@ -47,6 +67,21 @@ public class OrderModel {
         this.orderStatus = orderStatus;
         this.razorpay_order_id = razorpay_order_id;
         this.couponName = couponName;
+    }
+
+    public OrderModel(int orderId, UserModel userModel, List<ProductModel> productModelList, float price, Date orderDate, String orderTrackingNumber, OrderStatus orderStatus, String orderStatusString, Date expectedArrivalDate, String razorpay_order_id, String couponName, String paymentMode) {
+        OrderId = orderId;
+        this.userModel = userModel;
+        this.productModelList = productModelList;
+        this.price = price;
+        this.orderDate = orderDate;
+        this.orderTrackingNumber = orderTrackingNumber;
+        this.orderStatus = orderStatus;
+        this.orderStatusString = orderStatusString;
+        this.expectedArrivalDate = expectedArrivalDate;
+        this.razorpay_order_id = razorpay_order_id;
+        this.couponName = couponName;
+        this.paymentMode = paymentMode;
     }
 
     public OrderModel(int orderId, UserModel userModel, List<ProductModel> productModelList, float price, Date orderDate, String orderTrackingNumber, OrderStatus orderStatus, String razorpay_order_id, String couponName, String paymentMode) {
@@ -64,6 +99,22 @@ public class OrderModel {
 
     public OrderModel() {
 
+    }
+
+    public String getOrderStatusString() {
+        return orderStatusString;
+    }
+
+    public void setOrderStatusString(String orderStatusString) {
+        this.orderStatusString = orderStatusString;
+    }
+
+    public Date getExpectedArrivalDate() {
+        return expectedArrivalDate;
+    }
+
+    public void setExpectedArrivalDate(Date expectedArrivalDate) {
+        this.expectedArrivalDate = expectedArrivalDate;
     }
 
     public int getOrderId() {

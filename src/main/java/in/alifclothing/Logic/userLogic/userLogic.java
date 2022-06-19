@@ -3,15 +3,16 @@ package in.alifclothing.Logic.userLogic;
 import in.alifclothing.Dto.ChangePasswordRequest;
 import in.alifclothing.Dto.Response;
 import in.alifclothing.model.*;
+import org.json.JSONObject;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public interface userLogic {
-    Response<ShoppingCartModel> addProductToCart(Integer product_id,String username);
+    Response<ShoppingCartModel> addProductToCart(Integer product_id, String username, String sizeObject);
 
-    Response<ShoppingCartModel> getUserCart(String email);
+    Response<Object> getUserCart(String email);
 
     Response<String> deleteProductFromCart(Integer product_id, Integer cart_id);
 
@@ -54,4 +55,6 @@ public interface userLogic {
     Response<String> returnOrder(Integer orderId);
 
     Response<String> changePassword(ChangePasswordRequest changePasswordModel,String userEmail);
+
+    Response<String> confirmOrder(OrderModel orderModel);
 }

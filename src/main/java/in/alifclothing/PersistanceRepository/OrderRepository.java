@@ -25,7 +25,7 @@ public interface OrderRepository extends JpaRepository<OrderModel,Integer> {
 
 //    Pageable paging = PageRequest.of(pageNo,pageSize);
 
-    @Query("select o from  OrderModel o where o.userModel.user_id= :id")
+    @Query("select o from  OrderModel o where o.userModel.user_id= :id and o.orderStatusString IS NOT NULL")
     Page<OrderModel> findByUserIdPagination(@Param("id") Integer id, Pageable pageable);
 
 }

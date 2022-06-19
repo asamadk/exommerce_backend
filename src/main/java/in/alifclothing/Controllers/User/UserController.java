@@ -6,6 +6,7 @@ import in.alifclothing.Helper.Contants;
 import in.alifclothing.Logic.userLogic.userLogic;
 import in.alifclothing.model.*;
 import org.aspectj.weaver.ast.Or;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,10 +24,12 @@ public class UserController {
     @Autowired
     private userLogic userLogic;
 
-    @PostMapping("/cart/{product_id}")
-    public ResponseEntity<Response<ShoppingCartModel>> addtocart(@PathVariable("product_id") Integer product_id, Principal principal){
-
-        Response<ShoppingCartModel> response = userLogic.addProductToCart(product_id,principal.getName());
+    @PostMapping("/cart/{product_id}/{size}")
+    public ResponseEntity<Response<ShoppingCartModel>> addtocart(@PathVariable("product_id") Integer product_id, Principal principal, @PathVariable("size") String sizeObject){
+//        JSONObject jsonObject = new JSONObject(sizeObject);
+//        System.out.println("SiZE OBJ "+sizeObject);
+//        System.out.println("JSON OBJ "+jsonObject.get("genericsize"));
+        Response<ShoppingCartModel> response = userLogic.addProductToCart(product_id,principal.getName(),sizeObject);
         if(response.getErrorMap() == null){
             return new ResponseEntity<Response<ShoppingCartModel>>(response,HttpStatus.OK);
         }else{
@@ -40,18 +43,18 @@ public class UserController {
     }
 
     @GetMapping("/cart")
-    public ResponseEntity<Response<ShoppingCartModel>> getcart(Principal principal){
+    public ResponseEntity<Response<Object>> getcart(Principal principal){
 
-        Response<ShoppingCartModel> response = userLogic.getUserCart(principal.getName());
+        Response<Object> response = userLogic.getUserCart(principal.getName());
         if(response.getErrorMap() == null){
-            return new ResponseEntity<Response<ShoppingCartModel>>(response,HttpStatus.OK);
+            return new ResponseEntity<Response<Object>>(response,HttpStatus.OK);
         }else{
             if(response.getResponseCode().equals(Contants.NOT_FOUND_404)){
-                return new ResponseEntity<Response<ShoppingCartModel>>(response,HttpStatus.NOT_FOUND);
+                return new ResponseEntity<Response<Object>>(response,HttpStatus.NOT_FOUND);
             }
         }
 
-        return new ResponseEntity<Response<ShoppingCartModel>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<Response<Object>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @DeleteMapping("/cart/{cart_id}/{product_id}")
@@ -298,6 +301,20 @@ public class UserController {
     @PostMapping("/password")
     public ResponseEntity<Response<String>> changePassword(@RequestBody ChangePasswordRequest changePasswordRequest,Principal principal){
         Response<String> response = userLogic.changePassword(changePasswordRequest,principal.getName());
+        if(response.getErrorMap() == null){
+            return new ResponseEntity<Response<String>>(response,HttpStatus.OK);
+        }else{
+            if(response.getResponseCode().equals(Contants.NOT_FOUND_404)){
+                return new ResponseEntity<Response<String>>(response,HttpStatus.NOT_FOUND);
+            }
+        }
+
+        return new ResponseEntity<Response<String>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @PostMapping("/order/success")
+    public ResponseEntity<Response<String>> orderSuccess(@RequestBody OrderModel orderModel){
+        Response<String> response = userLogic.confirmOrder(orderModel);
         if(response.getErrorMap() == null){
             return new ResponseEntity<Response<String>>(response,HttpStatus.OK);
         }else{

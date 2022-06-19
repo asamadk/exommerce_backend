@@ -35,6 +35,9 @@ public class UserModel {
     @OneToMany(mappedBy = "userModel")
     private List<OrderModel> orderModels;
     @JsonIgnore
+    @OneToMany(mappedBy = "userModel")
+    private List<UserProductInformation> userProductInformations;
+    @JsonIgnore
     @OneToOne(mappedBy = "userModel")
     private WishlistModel wishlistModel;
     public UserModel(){}
@@ -68,6 +71,15 @@ public class UserModel {
     }
 
     //Getters and setters
+
+
+    public List<UserProductInformation> getUserProductInformations() {
+        return userProductInformations;
+    }
+
+    public void setUserProductInformations(List<UserProductInformation> userProductInformations) {
+        this.userProductInformations = userProductInformations;
+    }
 
     public int getUser_id() {
         return user_id;

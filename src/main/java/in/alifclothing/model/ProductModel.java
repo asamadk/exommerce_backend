@@ -39,6 +39,9 @@ public class ProductModel {
     @JsonIgnore
     @ManyToMany(mappedBy = "productModelList")
     private List<OrderModel> orderModel;
+    @JsonIgnore
+    @OneToMany(mappedBy = "productModel")
+    private List<UserProductInformation> userProductInformations;
 
     public ProductModel(String product_name, int product_weight, float product_price,float product_real_price,
                         String product_small_Desc, String product_long_Desc, String product_img1,
@@ -67,6 +70,13 @@ public class ProductModel {
 
     }
 
+    public List<UserProductInformation> getUserProductInformations() {
+        return userProductInformations;
+    }
+
+    public void setUserProductInformations(List<UserProductInformation> userProductInformations) {
+        this.userProductInformations = userProductInformations;
+    }
 
     public int getProduct_id() {
         return product_id;

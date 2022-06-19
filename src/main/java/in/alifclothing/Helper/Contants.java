@@ -25,4 +25,15 @@ public class Contants {
     public static final String CREDIT_CARD_PAYMENT = "CREDIT_CARD";
     public static final String DEBIT_CARD_PAYMENT = "DEBIT_CARD";
     public static final String UPI_PAYMENT = "UPI";
+
+    public static final String ORDER_STATUS_NEW = "Placed";
+    public static final String ORER_STATUS_PHASE_2 = "Awaiting Shipment";
+    public static final String ORER_STATUS_PHASE_3 = "Awaiting Pickup";
+    public static final String ORER_STATUS_PHASE_4 = "Partially Shipped ";
+    public static final String ORER_STATUS_PHASE_5 = "Completed";
+    public static final String ORER_STATUS_CANCELED = "Cancelled";
+    public static final String ORER_STATUS_DECLINED = "Declined";
+    public static final String ORER_STATUS_REFUNDED = "Refunded";
+    public static final String ORER_STATUS_RETURNED = "Returned";
+
 }

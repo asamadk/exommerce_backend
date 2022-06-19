@@ -1,5 +1,7 @@
 package in.alifclothing.Logic.userLogic;
 
+import ch.qos.logback.core.net.ObjectWriter;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import in.alifclothing.Dto.ChangePasswordRequest;
 import in.alifclothing.Dto.Response;
 import in.alifclothing.Helper.Contants;
@@ -7,13 +9,23 @@ import in.alifclothing.PersistanceRepository.*;
 import in.alifclothing.model.*;
 import org.aspectj.weaver.ast.Or;
 import org.checkerframework.checker.units.qual.A;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.data.domain.*;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
 public class userLogicImplementation implements userLogic{
@@ -36,9 +48,15 @@ public class userLogicImplementation implements userLogic{
     private OrderStatusRepository orderStatusRepository;
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+    @Autowired
+    private JavaMailSender javaMailSender;
+    @Autowired
+    private Environment evn;
+    @Autowired
+    private UserProductInfoRepository userProductInfoRepository;
 
     @Override
-    public Response<ShoppingCartModel> addProductToCart(Integer product_id, String email) {
+    public Response<ShoppingCartModel> addProductToCart(Integer product_id, String email, String sizeObject) {
 
         Response<ShoppingCartModel> response = new Response<>();
         Map<String,String> errorMap = new HashMap<>();
@@ -82,8 +100,16 @@ public class userLogicImplementation implements userLogic{
                 shoppingCartModel.setTotal(productModel.getProduct_real_price());
                 shoppingCartModel.setShoppingCartDate(new java.sql.Date(time));
                 shoppingCartRepository.save(shoppingCartModel);
-
             }
+            UserProductInformation userProductInformation = new UserProductInformation();
+            userProductInformation.setUserModel(user);
+            userProductInformation.setProductModel(productModel);
+            userProductInformation.setSizeJSON(sizeObject);
+            JSONObject jsonObject = new JSONObject(sizeObject);
+            Boolean isCustom = (Boolean) jsonObject.get("custom");
+            userProductInformation.setCustom(isCustom);
+            userProductInfoRepository.save(userProductInformation);
+            System.out.println("userProductInfoRepository : "+userProductInformation.toString());
             List<ShoppingCartModel> shoppingCartModels = new ArrayList<>();
             shoppingCartModels.add(shoppingCartModel);
             response.setResponseWrapper(shoppingCartModels);
@@ -101,9 +127,9 @@ public class userLogicImplementation implements userLogic{
     }
 
     @Override
-    public Response<ShoppingCartModel> getUserCart(String email) {
+    public Response<Object> getUserCart(String email) {
 
-        Response<ShoppingCartModel> response = new Response<>();
+        Response<Object> response = new Response<>();
         Map<String,String> errorMap = new HashMap<>();
 
         UserModel user = userRepository.findByEmail(email);
@@ -116,18 +142,28 @@ public class userLogicImplementation implements userLogic{
         }
         Optional<ShoppingCartModel> shoppingCartModel = shoppingCartRepository.findByUserId(user.getUser_id());
         ShoppingCartModel shoppingCartModel1 ;
+        List<Object> responseObject = new ArrayList<>();
+        List<Integer> productIDs = new ArrayList<>();
         if(shoppingCartModel.isPresent()){
-            List<ShoppingCartModel> shoppingCartModels = new ArrayList<>();
-            shoppingCartModels.add(shoppingCartModel.get());
-            response.setResponseWrapper(shoppingCartModels);
+            responseObject.add(shoppingCartModel.get());
+            response.setResponseWrapper(responseObject);
             response.setResponseDesc(Contants.SUCCESS);
             response.setResponseCode(Contants.OK_200);
+            shoppingCartModel.get().getProductModelList().stream().forEach(product -> {
+                productIDs.add(product.getProduct_id());
+            });
         }else{
             response.setResponseCode(Contants.NOT_FOUND_404);
             errorMap.put(Contants.ERROR,"No cart found");
             response.setErrorMap(errorMap);
             response.setResponseDesc(Contants.FALIURE);
         }
+
+        List<UserProductInformation> productInformationList =
+                userProductInfoRepository.
+                        getProductInformationByUserNameAndProductIds(productIDs,user.getUser_id());
+        responseObject.addAll(productInformationList);
+        response.setResponseWrapper(responseObject);
         return response;
     }
 
@@ -749,5 +785,67 @@ public class userLogicImplementation implements userLogic{
         return response;
     }
 
+    @Override
+    public Response<String> confirmOrder(OrderModel orderModel) {
+        Map<String,String> errorMap = new HashMap<>();
+        Response<String> response = new Response<>();
+        try{
+            if(!orderModel.getPaymentMode().isEmpty()){
+                orderModel.setOrderStatusString(Contants.ORDER_STATUS_NEW);
+                Date today = new Date();
+                Date after7Days = new Date(today.getTime()+ ((1000 * 60 * 60 * 24)*7));
+                orderModel.setExpectedArrivalDate(after7Days);
+                orderRepository.save(orderModel);
+            }
+            sendOrderSuccessMailToUser(orderModel.getUserModel().getEmail(),orderModel);
+//            sendOrderSuccessMailToUser("vekoco5655@mahazai.com",orderModel);
+            sendOrderSuccessfullMailToAlif(orderModel);
+            response.setResponseCode(Contants.OK_200);
+            response.setResponseDesc(Contants.SUCCESS);
+            response.setResponseWrapper(Collections.singletonList("Order placed successfully"));
+        }catch (Exception exception){
+            response.setResponseWrapper(null);
+            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
+            response.setResponseDesc(Contants.FALIURE);
+            errorMap.put(Contants.ERROR,exception.getMessage());
+            response.setErrorMap(errorMap);
+            exception.printStackTrace();
+        }
+        return response;
+    }
+
+    private void sendOrderSuccessfullMailToAlif(OrderModel orderModel) throws MessagingException, IOException {
+        String email = evn.getProperty("alif.mail.for.order");
+        MimeMessage message = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message);
+        helper.setFrom(Objects.requireNonNull(evn.getProperty("spring.mail.username")),"Alif Support");
+        helper.setTo(email);
+        String subject = "AN ORDER HAS BEEN PLACED";
+        ObjectMapper objectMapper = new ObjectMapper();
+        String contentJSON = objectMapper.writeValueAsString(orderModel);
+//        String content = contentJSON;
+        System.out.println("EMAIL :: "+contentJSON);
+        helper.setSubject(subject);
+        helper.setText(contentJSON,false);
+        javaMailSender.send(message);
+    }
+
+    private void sendOrderSuccessMailToUser(String email,OrderModel orderModel) throws MessagingException, UnsupportedEncodingException {
+        MimeMessage message = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message);
+        helper.setFrom(Objects.requireNonNull(evn.getProperty("spring.mail.username")),"Alif Support");
+        helper.setTo(email);
+        String alifURL = "https://www.alifclothing.in/order/detail/"+orderModel.getOrderId();
+        String subject = "ORDER PLACED SUCCESSFULLY";
+        String content = "<p>Hello "+orderModel.getUserModel().getUser_Fname()+"</p>"
+                +"<p>Your order has been placed</p>"
+                +"<p><b>Order ID </b> # "+orderModel.getOrderId()+"</p>"
+                +"<p><b>Estimated delivery date</b> : "+orderModel.getExpectedArrivalDate()+"<p>"
+                +"<p>If it was not you contact Alif support immediately</p>"
+                +"<p><b><a href=\""+ alifURL +"\">For more information of your order click here</a></b><p>";
+        helper.setSubject(subject);
+        helper.setText(content,true);
+        javaMailSender.send(message);
+    }
 
 }
