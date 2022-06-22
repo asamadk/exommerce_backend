@@ -4,6 +4,7 @@ import in.alifclothing.Dto.ChangePasswordRequest;
 import in.alifclothing.Dto.Response;
 import in.alifclothing.Helper.Contants;
 import in.alifclothing.Logic.userLogic.userLogic;
+import in.alifclothing.PersistanceRepository.UserProductInfoRepository;
 import in.alifclothing.model.*;
 import org.aspectj.weaver.ast.Or;
 import org.json.JSONObject;
@@ -57,11 +58,14 @@ public class UserController {
         return new ResponseEntity<Response<Object>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @DeleteMapping("/cart/{cart_id}/{product_id}")
-    public ResponseEntity<Response<String>> deletefromcart(@PathVariable("product_id") Integer product_id,@PathVariable("cart_id") Integer cart_id){
+    @DeleteMapping("/cart/{cart_id}/{product_id}/{userProductInformationId}")
+    public ResponseEntity<Response<String>> deletefromcart(@PathVariable("product_id") Integer product_id,
+                                                           @PathVariable("cart_id") Integer cart_id,
+                                                           @PathVariable("userProductInformationId") Integer userProductInfoId){
 
-        Response<String> response = userLogic.deleteProductFromCart(product_id,cart_id);
-        if(response.getErrorMap() == null){
+        System.out.println("PRODUCT INFO : "+userProductInfoId);
+        Response<String> response = userLogic.deleteProductFromCart(product_id,cart_id,userProductInfoId);;
+        if(response != null && response.getErrorMap() == null){
             return new ResponseEntity<Response<String>>(response,HttpStatus.OK);
         }else{
             if(response.getResponseCode().equals(Contants.NOT_FOUND_404)){

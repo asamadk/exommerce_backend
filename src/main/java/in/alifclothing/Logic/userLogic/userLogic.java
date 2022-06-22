@@ -14,7 +14,7 @@ public interface userLogic {
 
     Response<Object> getUserCart(String email);
 
-    Response<String> deleteProductFromCart(Integer product_id, Integer cart_id);
+    Response<String> deleteProductFromCart(Integer product_id, Integer cart_id, Integer userProductInfoId);
 
     Response<String > addCouponToCart(String couponName,Integer cartId);
 

@@ -168,11 +168,12 @@ public class userLogicImplementation implements userLogic{
     }
 
     @Override
-    public Response<String> deleteProductFromCart(Integer product_id, Integer cart_id) {
+    public Response<String> deleteProductFromCart(Integer product_id, Integer cart_id, Integer userProductInfoId) {
 
         Response<String> response = new Response<>();
         Map<String,String> errorMap = new HashMap<>();
 
+        userProductInfoRepository.deleteById(userProductInfoId);
         Optional<ShoppingCartModel> shoppingcartoptional = shoppingCartRepository.findById(cart_id);
         shoppingcartoptional.ifPresent(shoppingCartModel -> {
             productRepository.findById(product_id).ifPresent(productModel -> {
@@ -370,6 +371,14 @@ public class userLogicImplementation implements userLogic{
         return response;
     }
 
+    private void addOrderIdToProductSizeInfo(UserModel user, OrderModel orderModel){
+        List<UserProductInformation> userProductInformationList = userProductInfoRepository.getProductInformationByUserId(user.getUser_id());
+        userProductInformationList.stream().forEach(userProdInfo -> {
+            userProdInfo.setOrderModel(orderModel);
+        });
+        userProductInfoRepository.saveAll(userProductInformationList);
+    }
+
     @Override
     public Response<OrderModel> createOrderFromCart(String email) {
 
@@ -383,6 +392,7 @@ public class userLogicImplementation implements userLogic{
             response.setErrorMap(errorMap);
             response.setResponseDesc(Contants.FALIURE);
         }
+
         Optional<ShoppingCartModel> shoppingCartModel = shoppingCartRepository.findByUserId(user.getUser_id());
         long time = System.currentTimeMillis();
         boolean flag =  shoppingCartModel.isPresent();
@@ -399,6 +409,7 @@ public class userLogicImplementation implements userLogic{
             //TODO : add coupon name in order field
             order.setRazorpay_order_id(cart.getRazorpay_order_id());
             orderRepository.save(order);
+            addOrderIdToProductSizeInfo(user,order);
             shoppingCartRepository.deleteById(cart.getShoppingCartId());
             List<OrderModel> orderModelList = new ArrayList<>();
             orderModelList.add(order);
