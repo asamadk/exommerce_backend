@@ -17,7 +17,9 @@ public class ProductModel {
     private int product_weight;
     private float product_price;
     private float product_real_price;
+    @Column(length = 500)
     private String product_small_Desc;
+    @Column(length = 500)
     private String product_long_Desc;
     private String product_img1;
     private String product_img2;

@@ -77,6 +77,7 @@ public class userLogicImplementation implements userLogic{
             productModel = product.get();
             Optional<ShoppingCartModel> cart = shoppingCartRepository.findByUserId(user.getUser_id());
             if(cart.isPresent()){
+                deleteCouponFromCart(cart.get().getShoppingCartId());
                 shoppingCartModel = cart.get();
                 shoppingCartModel.setUserModel(user);
                 shoppingCartModel.getProductModelList().add(productModel);
@@ -176,6 +177,7 @@ public class userLogicImplementation implements userLogic{
         userProductInfoRepository.deleteById(userProductInfoId);
         Optional<ShoppingCartModel> shoppingcartoptional = shoppingCartRepository.findById(cart_id);
         shoppingcartoptional.ifPresent(shoppingCartModel -> {
+            deleteCouponFromCart(shoppingCartModel.getShoppingCartId());
             productRepository.findById(product_id).ifPresent(productModel -> {
                 shoppingCartModel.getProductModelList().remove(productModel);
                 shoppingCartModel.setCouponsModel(null);
@@ -214,22 +216,25 @@ public class userLogicImplementation implements userLogic{
             shoppingCartModel.ifPresent(cart -> {
                 if (!Objects.equals(couponsModel.get().getCouponName(), "")) {
                     couponsModel.ifPresent(coupon -> {
+                        if(coupon.getMinimumPurchasePrice() > cart.getTotalAmountBeforeDiscount()){
+                            errorMap.put(Contants.ERROR,"Minimum total needs to be "+coupon.getMinimumPurchasePrice()+" to apply this coupon");
+                            response.setErrorMap(errorMap);
+                            response.setResponseDesc(Contants.FALIURE);
+                            response.setResponseCode(Contants.CLIENT_400);
+                            return;
+                        }
                         cart.setCouponsModel(coupon);
                         cart.setCouponUsed(true);
 
                         List<ProductModel> productModelList = cart.getProductModelList();
-                        float totalbeforediscount = 0;
-                        float total = 0;
-                        for (ProductModel productModel : productModelList) {
-                            totalbeforediscount += productModel.getProduct_price();
-                            total += productModel.getProduct_real_price();
-                        }
-//                        float total = totalbeforediscount;
+                        float totalbeforediscount = cart.getTotalAmountBeforeDiscount();
+                        float total = cart.getTotalAmountBeforeDiscount();
                         if (cart.isCouponUsed()) {
-//                            if (total * (cart.getCouponsModel().getCouponDiscount() / 100F) < coupon.getMaximumDiscount()) {
-                                total = total - (total * (cart.getCouponsModel().getCouponDiscount() / 100F));
-//                            }
-//                            total = cart.getCouponsModel().getMaximumDiscount();
+                            float removeAmount = total * (cart.getCouponsModel().getCouponDiscount() / 100F);
+                            if(removeAmount > coupon.getMaximumDiscount()){
+                                removeAmount = (float) coupon.getMaximumDiscount();
+                            }
+                            total = total - removeAmount;
                         }
                         cart.setTotal(total);
                         cart.setTotalAmountBeforeDiscount(totalbeforediscount);
@@ -286,7 +291,14 @@ public class userLogicImplementation implements userLogic{
 
         Optional<ShoppingCartModel> cartById = shoppingCartRepository.findById(cartId);
         cartById.ifPresent(cart -> {
-            cart.setTotal(cart.getTotalAmountBeforeDiscount());
+            cart.setTotal(0);
+            cart.getProductModelList().forEach(product -> {
+                float total = cart.getTotal();
+                total = total + product.getProduct_real_price();
+                cart.setTotal(total);
+
+            });
+//            cart.setTotal(cart.getTotalAmountBeforeDiscount());
             cart.setCouponsModel(null);
             cart.setCouponUsed(false);
             shoppingCartRepository.save(cart);

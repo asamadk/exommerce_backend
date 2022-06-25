@@ -14,7 +14,9 @@ public class UserModel {
     private String user_Fname;
     private String user_Lname;
     private String email;
+    @JsonIgnore
     private String user_Password;
+    @JsonIgnore
     private String Role;
     private String user_City;
     private String user_State;
