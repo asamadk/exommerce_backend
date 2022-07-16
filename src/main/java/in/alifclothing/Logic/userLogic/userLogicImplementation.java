@@ -615,9 +615,17 @@ public class userLogicImplementation implements userLogic{
             Optional<WishlistModel> wishlistModelOptional = wishlistRepository.findByUserId(user.getUser_id());
             wishlistModelOptional.ifPresent(wishlist -> {
                 wishlist.setUserModel(user);
+                List<ProductModel> productModelList = wishlist.getProductModelList();
+                if(productModelList.contains(product)){
+                    response.setResponseCode(Contants.OK_200);
+                    response.setErrorMap(null);
+                    response.setResponseDesc(Contants.FALIURE);
+                    response.setResponseWrapper(Collections.singletonList("Product already exists in your wishlist"));
+                    return;
+                }
                 wishlist.getProductModelList().add(product);
                 wishlistRepository.save(wishlist);
-                response.setResponseWrapper(Arrays.asList("Product Added"));
+                response.setResponseWrapper(Collections.singletonList("Product Added"));
             });
             if(!wishlistModelOptional.isPresent()){
                 WishlistModel wishlist = new WishlistModel();
@@ -626,7 +634,7 @@ public class userLogicImplementation implements userLogic{
                 productModelList.add(product);
                 wishlist.setProductModelList(productModelList);
                 wishlistRepository.save(wishlist);
-                response.setResponseWrapper(Arrays.asList("Wishlist Created"));
+                response.setResponseWrapper(Collections.singletonList("Wishlist Created"));
             }
             response.setResponseDesc(Contants.SUCCESS);
             response.setResponseCode(Contants.OK_200);
