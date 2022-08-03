@@ -14,7 +14,7 @@ public class UserModel {
     private String user_Fname;
     private String user_Lname;
     private String email;
-    @JsonIgnore
+//    @JsonIgnore
     private String user_Password;
     @JsonIgnore
     private String Role;
@@ -250,5 +250,33 @@ public class UserModel {
 
     public void setResetPasswordToken(String resetPasswordToken) {
         this.resetPasswordToken = resetPasswordToken;
+    }
+
+    @Override
+    public String toString() {
+        return "UserModel{" +
+                "user_id=" + user_id +
+                ", user_Fname='" + user_Fname + '\'' +
+                ", user_Lname='" + user_Lname + '\'' +
+                ", email='" + email + '\'' +
+                ", user_Password='" + user_Password + '\'' +
+                ", Role='" + Role + '\'' +
+                ", user_City='" + user_City + '\'' +
+                ", user_State='" + user_State + '\'' +
+                ", user_zip=" + user_zip +
+                ", user_email_verified=" + user_email_verified +
+                ", user_registration_Date=" + user_registration_Date +
+                ", user_verification_code=" + user_verification_code +
+                ", user_phone_number='" + user_phone_number + '\'' +
+                ", user_country='" + user_country + '\'' +
+                ", user_address1='" + user_address1 + '\'' +
+                ", user_address2='" + user_address2 + '\'' +
+                ", resetPasswordToken='" + resetPasswordToken + '\'' +
+                ", user_block=" + user_block +
+                ", shoppingCartModel=" + shoppingCartModel +
+                ", orderModels=" + orderModels +
+                ", userProductInformations=" + userProductInformations +
+                ", wishlistModel=" + wishlistModel +
+                '}';
     }
 }
