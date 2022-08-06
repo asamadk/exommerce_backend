@@ -38,7 +38,7 @@ public class homeLogicImplementation implements homeLogic {
 
         Response<UserModel> response = new Response<>();
         HashMap<String,String> errorMap = new HashMap<>();
-        System.out.println("User model"+userModel.toString());
+//        System.out.println("User model"+userModel.toString());
         if(checkforEmailPresence.isPresent()) {
             errorMap.put(Contants.ERROR, "Email Already present");
             response.setErrorMap(errorMap);
