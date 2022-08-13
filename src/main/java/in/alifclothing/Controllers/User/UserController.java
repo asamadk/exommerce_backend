@@ -198,10 +198,10 @@ public class UserController {
     }
 
 
-    @PostMapping("/order")
-    public ResponseEntity<Response<OrderModel>> createOrder(Principal principal){
-
-        Response<OrderModel> response = userLogic.createOrderFromCart(principal.getName());
+    @PostMapping("/order/{coupon_name}")
+    public ResponseEntity<Response<OrderModel>> createOrder(Principal principal, @PathVariable("coupon_name") String couponName ){
+        System.out.println("Coupon Name = "+couponName);
+        Response<OrderModel> response = userLogic.createOrderFromCart(principal.getName(), couponName);
         if(response.getErrorMap() == null){
             return new ResponseEntity<Response<OrderModel>>(response,HttpStatus.OK);
         }else{

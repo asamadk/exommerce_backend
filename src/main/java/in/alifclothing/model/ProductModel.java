@@ -45,6 +45,8 @@ public class ProductModel {
     @OneToMany(mappedBy = "productModel")
     private List<UserProductInformation> userProductInformations;
 
+    private Integer quantity;
+
     public ProductModel(String product_name, int product_weight, float product_price,float product_real_price,
                         String product_small_Desc, String product_long_Desc, String product_img1,
                         String product_img2, String product_img3, String product_img4, CategoryModel categoryModel,List<ShoppingCartModel> shoppingCartModel,
@@ -67,6 +69,8 @@ public class ProductModel {
         this.wishlistModel = wishlistModel;
         this.orderModel = orderModel;
     }
+
+
 
     public ProductModel() {
 
@@ -224,4 +228,12 @@ public class ProductModel {
         this.product_real_price = product_real_price;
     }
 
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
 }

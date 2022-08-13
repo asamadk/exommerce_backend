@@ -1,14 +1,11 @@
 package in.alifclothing.Logic.userLogic;
 
-import ch.qos.logback.core.net.ObjectWriter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import in.alifclothing.Dto.ChangePasswordRequest;
 import in.alifclothing.Dto.Response;
 import in.alifclothing.Helper.Contants;
 import in.alifclothing.PersistanceRepository.*;
 import in.alifclothing.model.*;
-import org.aspectj.weaver.ast.Or;
-import org.checkerframework.checker.units.qual.A;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -22,10 +19,8 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 public class userLogicImplementation implements userLogic{
@@ -212,6 +207,25 @@ public class userLogicImplementation implements userLogic{
 
         Optional<ShoppingCartModel> shoppingCartModel = shoppingCartRepository.findById(cartId);
         Optional<CouponsModel> couponsModel = Optional.ofNullable(couponRepository.findByCouponName(couponName));
+//        orderRepository.f
+        Integer userID = shoppingCartModel.get().getUserModel().getUser_id();
+        List<OrderModel> optionalOrderModel = orderRepository.findByUserId(userID);
+        AtomicReference<Boolean> toReturn = new AtomicReference<>(false);
+        if(optionalOrderModel.size() > 0){
+            optionalOrderModel.stream().forEach(orderModel -> {
+                if( orderModel.getCouponName().equalsIgnoreCase(couponName)){
+                    toReturn.set(true);
+                    response.setResponseWrapper(Arrays.asList("Coupon already used"));
+                    response.setResponseDesc(Contants.SUCCESS);
+                    response.setResponseCode(Contants.OK_200);
+                }
+            });
+        }
+
+        if(toReturn.get()){
+            return response;
+        }
+
         if(couponsModel.isPresent()) {
             shoppingCartModel.ifPresent(cart -> {
                 if (!Objects.equals(couponsModel.get().getCouponName(), "")) {
@@ -392,7 +406,7 @@ public class userLogicImplementation implements userLogic{
     }
 
     @Override
-    public Response<OrderModel> createOrderFromCart(String email) {
+    public Response<OrderModel> createOrderFromCart(String email, String couponName) {
 
         Response<OrderModel> response = new Response<>();
         Map<String,String> errorMap = new HashMap<>();
@@ -411,6 +425,7 @@ public class userLogicImplementation implements userLogic{
 
         shoppingCartModel.ifPresent(cart -> {
             OrderModel order = new OrderModel();
+            order.setCouponName(couponName);
             order.setOrderDate(new Date(time));
             order.setPrice(cart.getTotal());
             order.setUserModel(user);
