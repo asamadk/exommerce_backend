@@ -1,6 +1,7 @@
 package in.alifclothing.Logic.homeLogic;
 
 import in.alifclothing.Dto.Response;
+import in.alifclothing.model.OrderModel;
 import in.alifclothing.model.UserModel;
 import javassist.NotFoundException;
 
@@ -28,5 +29,4 @@ public interface homeLogic {
     public boolean checkResetPasswordLinkandChangePassword(String token,String password);
 
     public Response<String> sendMessageContactUs(String name,String email,String subject, String body) throws MessagingException, UnsupportedEncodingException;
-
 }

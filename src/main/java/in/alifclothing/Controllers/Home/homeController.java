@@ -10,7 +10,6 @@ import javassist.NotFoundException;
 import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,8 +22,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -38,6 +35,8 @@ public class homeController {
     private userLogic userLogic;
     @Autowired
     private JavaMailSender javaMailSender;
+    @Autowired
+    private in.alifclothing.Logic.adminLogic.adminLogic adminLogic;
 
     public homeController(in.alifclothing.FileHandlerService.fileStorageService fileStorageService){
         this.fileStorageService = fileStorageService;
@@ -79,6 +78,20 @@ public class homeController {
 //                .header(HttpHeaders.CONTENT_DISPOSITION,"attachment;fileName="+resource.getFilename())
                 .header(HttpHeaders.CONTENT_DISPOSITION,"inline;fileName="+resource.getFilename()) //to render in browser insetead of downloading
                 .body(resource);
+    }
+
+    @GetMapping("/mail/order/details/{orderId}")
+    public ResponseEntity<Response<OrderModel>> getOrderById(@PathVariable String orderId){
+        Response<OrderModel> response = adminLogic.getSingleOrderByOrderId(Integer.parseInt(orderId));
+        if(response.getErrorMap() == null){
+            return new ResponseEntity<Response<OrderModel>>(response,HttpStatus.OK);
+        }else{
+            if(response.getResponseCode().equals(Contants.NOT_FOUND_404)){
+                return new ResponseEntity<Response<OrderModel>>(response,HttpStatus.NOT_FOUND);
+            }
+        }
+
+        return new ResponseEntity<Response<OrderModel>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 

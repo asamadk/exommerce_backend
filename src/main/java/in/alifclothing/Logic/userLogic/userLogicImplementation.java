@@ -866,13 +866,14 @@ public class userLogicImplementation implements userLogic{
         MimeMessageHelper helper = new MimeMessageHelper(message);
         helper.setFrom(Objects.requireNonNull(evn.getProperty("spring.mail.username")),"Alif Support");
         helper.setTo(email);
+        String alifURL = "https://www.alifclothing.in/admin/order/details/"+orderModel.getOrderId();
         String subject = "AN ORDER HAS BEEN PLACED";
         ObjectMapper objectMapper = new ObjectMapper();
-        String contentJSON = objectMapper.writeValueAsString(orderModel);
-//        String content = contentJSON;
-        System.out.println("EMAIL :: "+contentJSON);
+//        String contentJSON = objectMapper.writeValueAsString(orderModel);
+        String contentJSON = "<p>An order is placed by "+orderModel.getUserModel().getUser_Fname() + orderModel.getUserModel().getUser_Lname()
+                            +"<p><b><a href=\""+ alifURL +"\">For more information click here</a></b><p>";
         helper.setSubject(subject);
-        helper.setText(contentJSON,false);
+        helper.setText(contentJSON,true);
         javaMailSender.send(message);
     }
 
