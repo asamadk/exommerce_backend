@@ -213,10 +213,10 @@ public class userLogicImplementation implements userLogic{
         AtomicReference<Boolean> toReturn = new AtomicReference<>(false);
         if(optionalOrderModel.size() > 0){
             optionalOrderModel.stream().forEach(orderModel -> {
-                if( orderModel.getCouponName().equalsIgnoreCase(couponName)){
+                if( orderModel.getCouponName() != null && orderModel.getCouponName().equalsIgnoreCase(couponName)){
                     toReturn.set(true);
                     response.setResponseWrapper(Arrays.asList("Coupon already used"));
-                    response.setResponseDesc(Contants.SUCCESS);
+                    response.setResponseDesc("You have already used this coupon");
                     response.setResponseCode(Contants.OK_200);
                 }
             });
