@@ -54,7 +54,7 @@ public class securityConfiguration extends WebSecurityConfigurerAdapter {
 		final CorsConfiguration configuration  = new CorsConfiguration();
 		configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000","http://43.204.244.109:3000/","https://www.alifclothing.in/"));
 		configuration.setAllowedMethods(Collections.singletonList("*"));
-        configuration.addAllowedOrigin("*");
+//        configuration.addAllowedOrigin("*");
 		configuration.setAllowCredentials(true);
 //		configuration.setAllowedHeaders(Arrays.asList("Authorization","Cache-Control","Content-Type"));
 		configuration.setAllowedHeaders(Collections.singletonList("*"));

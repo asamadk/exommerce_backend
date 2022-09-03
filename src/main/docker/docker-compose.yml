@@ -11,31 +11,34 @@ services:
     depends_on:
       - db
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/alif_ecommerce
-      #      - SPRING_DATASOURCE_URL=jdbc:postgresql://host.docker.internal:5432/alif_ecommerce
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=wolf
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: wolfwolf
+      POSTGRES_URL: alifclothing-dev.c6if2rg6alij.ap-south-1.rds.amazonaws.com
+      POSTGRES_PORT: 5432
+#      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/alif_ecommerce
+#      - SPRING_DATASOURCE_USERNAME=postgres
+#      - SPRING_DATASOURCE_PASSWORD=wolf
+#      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
 
-  db:
-    image: 'postgres:13.1-alpine'
-    container_name: db
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=wolf
-      - POSTGRES_DB=alif_ecommerce
-    ports:
-      - 5432:5432
-    volumes:
-      - db-data:/var/lib/postgresql/data
-  pgadmin:
-    container_name: pgadmin4_container
-    image: dpage/pgadmin4
-    restart: always
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: root
-    ports:
-      - "5050:80"
-volumes:
-  db-data:
+#  db:
+#    image: 'postgres:13.1-alpine'
+#    container_name: db
+#    environment:
+#      - POSTGRES_USER=postgres
+#      - POSTGRES_PASSWORD=wolf
+#      - POSTGRES_DB=alif_ecommerce
+#    ports:
+#      - 5432:5432
+#    volumes:
+#      - db-data:/var/lib/postgresql/data
+#  pgadmin:
+#    container_name: pgadmin4_container
+#    image: dpage/pgadmin4
+#    restart: always
+#    environment:
+#      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+#      PGADMIN_DEFAULT_PASSWORD: root
+#    ports:
+#      - "5050:80"
+#volumes:
+#  db-data:

@@ -135,7 +135,7 @@ public class homeController {
         return new ResponseEntity<Response<ProductModel>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @GetMapping("/couponss")
+    @GetMapping("/coupons")
     public ResponseEntity<Response<CouponsModel>> fetchCoupons(){
         Response<CouponsModel> response = userLogic.getAllCoupons();
         if(response.getErrorMap() == null){
