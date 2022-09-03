@@ -8,7 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:3000")
+//@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://43.204.244.109:3000/")
 @RestController
 @RequestMapping("/superuser")
 public class superUserController {

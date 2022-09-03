@@ -15,6 +15,9 @@ public interface UserProductInfoRepository extends JpaRepository<UserProductInfo
     @Query("select o from UserProductInformation o where o.userModel.user_id =:uid and o.orderModel IS NULL")
     List<UserProductInformation> getProductInformationByUserId(@Param("uid") Integer userID);
 
+    @Query("select o from UserProductInformation o where o.orderModel.OrderId =:uid")
+    List<UserProductInformation> getProductInformationByOrderId(@Param("uid") Integer orderId);
+
     @Query("select o from UserProductInformation o where o.userModel.user_id =:uid")
     List<UserProductInformation> temp(@Param("uid") Integer userID);
 

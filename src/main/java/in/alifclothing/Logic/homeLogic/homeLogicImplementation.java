@@ -1,8 +1,10 @@
 package in.alifclothing.Logic.homeLogic;
 
 import in.alifclothing.Dto.Response;
+import in.alifclothing.PersistanceRepository.UserProductInfoRepository;
 import in.alifclothing.PersistanceRepository.UserRepository;
 import in.alifclothing.model.UserModel;
+import in.alifclothing.model.UserProductInformation;
 import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -31,6 +33,9 @@ public class homeLogicImplementation implements homeLogic {
     private JavaMailSender javaMailSender;
     @Autowired
     private Environment evn;
+
+    @Autowired
+    private UserProductInfoRepository userProductInfoRepository;
 
     @Override
     public Response<?> persistUser(UserModel userModel) {
@@ -170,6 +175,25 @@ public class homeLogicImplementation implements homeLogic {
             response.setResponseDesc(Contants.FALIURE);
             errorMap.put(Contants.ERROR,e.getMessage());
             response.setErrorMap(errorMap);
+        }
+        return response;
+    }
+
+    @Override
+    public Response<UserProductInformation> getProductStitchDetails(Integer orderId) {
+        Map<String,String> errorMap = new HashMap<>();
+        Response<UserProductInformation> response = new Response<>();
+        List<UserProductInformation> userProductInformationList =
+                userProductInfoRepository.getProductInformationByOrderId(orderId);
+        if(userProductInformationList != null && userProductInformationList.size() > 0){
+            response.setResponseCode(Contants.OK_200);
+            response.setResponseDesc(Contants.SUCCESS);
+            response.setResponseWrapper(userProductInformationList);
+        }else{
+            errorMap.put(Contants.ERROR,Contants.UNAUTH_TOKEN);
+            response.setErrorMap(errorMap);
+            response.setResponseWrapper(null);
+            response.setResponseCode(Contants.CLIENT_400);
         }
         return response;
     }

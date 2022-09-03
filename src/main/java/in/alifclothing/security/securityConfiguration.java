@@ -52,27 +52,20 @@ public class securityConfiguration extends WebSecurityConfigurerAdapter {
     @Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		final CorsConfiguration configuration  = new CorsConfiguration();
-		//Preflight is a HTTP request that is sent before actual HTTP request sent by browser. These request is created
-		//by the browser.The browser check and it doesn't allow HTTPResponse if we don't configure
-		//CORS(Cross Origin Resource Sharing) for the webservices end point.
-		//configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080",""));
-		configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000","https://alif-frontend.herokuapp.com/","https://master.d2pzdecn8wow21.amplifyapp.com/","https://www.alifclothing.in/"));
-		//configuration.setAllowedMethods(Arrays.asList("GET","PUT","POST","DELETE","OPTIONS"));
-		configuration.setAllowedMethods(Arrays.asList("*")); //We use asterik, so that all HTTP methods are allowed.
-		//If we want to allow credentials for HTTPResponse and credentials, here, are cookies and Authorization header.
-		//Or, it could be SSL client certificate.If we want this info to be included, then credentials set to true.
+		configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000","http://43.204.244.109:3000/","https://www.alifclothing.in/"));
+		configuration.setAllowedMethods(Collections.singletonList("*"));
+        configuration.addAllowedOrigin("*");
 		configuration.setAllowCredentials(true);
 //		configuration.setAllowedHeaders(Arrays.asList("Authorization","Cache-Control","Content-Type"));
-		configuration.setAllowedHeaders(Arrays.asList("*"));//Allowed all headers.
+		configuration.setAllowedHeaders(Collections.singletonList("*"));
 		final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-		//source.registerCorsConfiguration("/authenticate", configuration);
 		source.registerCorsConfiguration("/**", configuration); //Specify the path pattern.
 		return (CorsConfigurationSource) source;
 	}
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.cors().and()
+        http.cors().configurationSource(corsConfigurationSource()).and()
                 .csrf().disable()
                 .sessionManagement()
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

@@ -17,7 +17,8 @@ import java.security.Principal;
 import java.util.List;
 
 //@CrossOrigin(origins = "http://localhost:3000")
-@CrossOrigin(origins = "http://localhost:3000", originPatterns = "https://master.d2pzdecn8wow21.amplifyapp.com/")
+//@CrossOrigin(origins = "http://localhost:3000", originPatterns = "https://master.d2pzdecn8wow21.amplifyapp.com/")
+@CrossOrigin(origins = "http://43.204.244.109:3000/")
 @RestController
 @RequestMapping("/user")
 public class UserController {

@@ -3,6 +3,7 @@ package in.alifclothing.Logic.homeLogic;
 import in.alifclothing.Dto.Response;
 import in.alifclothing.model.OrderModel;
 import in.alifclothing.model.UserModel;
+import in.alifclothing.model.UserProductInformation;
 import javassist.NotFoundException;
 
 import javax.mail.MessagingException;
@@ -29,4 +30,6 @@ public interface homeLogic {
     public boolean checkResetPasswordLinkandChangePassword(String token,String password);
 
     public Response<String> sendMessageContactUs(String name,String email,String subject, String body) throws MessagingException, UnsupportedEncodingException;
+
+    public Response<UserProductInformation> getProductStitchDetails(Integer orderId);
 }

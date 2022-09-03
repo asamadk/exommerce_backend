@@ -23,7 +23,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
-@CrossOrigin(origins = "http://localhost:3000")
+//@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://43.204.244.109:3000/")
 @RestController
 public class homeController {
 
@@ -134,7 +135,7 @@ public class homeController {
         return new ResponseEntity<Response<ProductModel>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @GetMapping("/coupons")
+    @GetMapping("/couponss")
     public ResponseEntity<Response<CouponsModel>> fetchCoupons(){
         Response<CouponsModel> response = userLogic.getAllCoupons();
         if(response.getErrorMap() == null){
@@ -224,6 +225,21 @@ public class homeController {
             }
         }
         return new ResponseEntity<Response<ProductModel>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @GetMapping("/tailor/details/{orderId}")
+    public ResponseEntity<Response<UserProductInformation>> getProductDetailsForTailor(@PathVariable String orderId){
+        Response<UserProductInformation> response = homeLogic.getProductStitchDetails(Integer.parseInt(orderId));
+        if(response.getErrorMap() == null){
+            return new ResponseEntity<Response<UserProductInformation>>(response,HttpStatus.OK);
+        }else{
+            if(response.getResponseCode().equals(Contants.NOT_FOUND_404)) {
+                return new ResponseEntity<Response<UserProductInformation>>(response, HttpStatus.NOT_FOUND);
+            }else if(response.getResponseCode().equals(Contants.CLIENT_400)){
+                return new ResponseEntity<Response<UserProductInformation>>(response,HttpStatus.UNAUTHORIZED);
+            }
+        }
+        return new ResponseEntity<Response<UserProductInformation>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 }

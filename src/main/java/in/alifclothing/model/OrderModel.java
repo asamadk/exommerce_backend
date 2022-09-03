@@ -27,6 +27,9 @@ public class OrderModel {
     private String couponName;
     private String paymentMode ;
 
+    private String orderSource;
+    private Boolean isPaid;
+
     @JsonIgnore
     @OneToMany(mappedBy = "orderModel")
     private List<UserProductInformation> userProductInformations;
@@ -99,6 +102,30 @@ public class OrderModel {
 
     public OrderModel() {
 
+    }
+
+    public String getOrderSource() {
+        return orderSource;
+    }
+
+    public void setOrderSource(String orderSource) {
+        this.orderSource = orderSource;
+    }
+
+    public Boolean getPaid() {
+        return isPaid;
+    }
+
+    public void setPaid(Boolean paid) {
+        isPaid = paid;
+    }
+
+    public List<UserProductInformation> getUserProductInformations() {
+        return userProductInformations;
+    }
+
+    public void setUserProductInformations(List<UserProductInformation> userProductInformations) {
+        this.userProductInformations = userProductInformations;
     }
 
     public String getOrderStatusString() {
