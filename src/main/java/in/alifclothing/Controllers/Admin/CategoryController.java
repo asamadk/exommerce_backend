@@ -20,9 +20,9 @@ public class CategoryController {
     private in.alifclothing.Logic.adminLogic.adminLogic adminLogic;
 
     @PostMapping("/category")
-    public ResponseEntity<Response<CategoryModel>> addcategory(@RequestPart("category") String categoryModel, @RequestPart("category_image") MultipartFile file){
+    public ResponseEntity<Response<CategoryModel>> addcategory(@RequestBody CategoryModel categoryModel){
 
-        Response<CategoryModel> response = adminLogic.addCategory(categoryModel,file);
+        Response<CategoryModel> response = adminLogic.addCategory(categoryModel);
         if(response.getErrorMap() == null){
             return new ResponseEntity<Response<CategoryModel>>(response, HttpStatus.OK);
         }

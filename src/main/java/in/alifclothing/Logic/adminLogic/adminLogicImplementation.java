@@ -121,50 +121,31 @@ public class adminLogicImplementation implements adminLogic{
         return response;
     }
 
-
-    //convert product to JSON and save it to database
     @Override
-    public Response<ProductModel> getproductJSON(String ProductModel,MultipartFile[] files,String catid) throws JsonProcessingException {
+    public Response<ProductModel> getproductJSON(ProductModel productModel) throws JsonProcessingException {
         Response<ProductModel> response = new Response<>();
         Map<String,String> errorMap = new HashMap<>();
 
-        ProductModel productJSON = new ProductModel();
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        productJSON = objectMapper.readValue(ProductModel,ProductModel.class);
-
-        List<String> uploadURL = new ArrayList<>();
-        Arrays.stream(files).forEach(file -> {
-            String filename = fileStorageService.storeFile(file);
-//            String url = ServletUriComponentsBuilder.fromCurrentContextPath().path("/download/").path(filename).toUriString();
-            uploadURL.add(filename);
-        });
-
         long millis = System.currentTimeMillis();
-        productJSON.setUpdateDate(new Date(millis));
+        productModel.setUpdateDate(new Date(millis));
+        productModel.setAvaialable(true);
 
-        productJSON.setProduct_img1(uploadURL.get(0));
-        productJSON.setProduct_img2(uploadURL.get(1));
-        productJSON.setProduct_img3(uploadURL.get(2));
-        productJSON.setProduct_img4(uploadURL.get(3));
+//        Optional<CategoryModel> categoryModel = categoriesRepository.findById(Integer.parseInt(productModel.cate));
 
-        productJSON.setAvaialable(true);
-        Optional<CategoryModel> categoryModel = categoriesRepository.findById(Integer.parseInt(catid));
+//        if(categoryModel.isPresent()){
+//            CategoryModel c = categoryModel.get();
+//            productJSON.setCategoryModel(c);
+//        }else{
+//            response.setResponseCode(Contants.NOT_FOUND_404);
+//            errorMap.put(Contants.ERROR,"No category found");
+//            response.setErrorMap(errorMap);
+//            response.setResponseDesc(Contants.FALIURE);
+//            return response;
+//        }
 
-        if(categoryModel.isPresent()){
-            CategoryModel c = categoryModel.get();
-            productJSON.setCategoryModel(c);
-        }else{
-            response.setResponseCode(Contants.NOT_FOUND_404);
-            errorMap.put(Contants.ERROR,"No category found");
-            response.setErrorMap(errorMap);
-            response.setResponseDesc(Contants.FALIURE);
-            return response;
-        }
-
-        productRepository.save(productJSON);
+        productRepository.save(productModel);
         List<ProductModel> productModelList = new ArrayList<>();
-        productModelList.add(productJSON);
+        productModelList.add(productModel);
         response.setResponseWrapper(productModelList);
         response.setResponseDesc(Contants.SUCCESS);
         response.setResponseCode(Contants.OK_200);
@@ -317,23 +298,13 @@ public class adminLogicImplementation implements adminLogic{
     }
 
     @Override
-    public Response<CategoryModel> addCategory(String categoryModel, MultipartFile file) {
+    public Response<CategoryModel> addCategory(CategoryModel categoryModel) {
         Response<CategoryModel> response = new Response<>();
         Map<String,String> errorMap = new HashMap<>();
 
-        CategoryModel categoryModelJSON = new CategoryModel();
-        try{
-            ObjectMapper objectMapper = new ObjectMapper();
-            categoryModelJSON = objectMapper.readValue(categoryModel,CategoryModel.class);
-        }catch (IOException e){
-            e.printStackTrace();
-        }
-        String filename = fileStorageService.storeFile(file);
-        String url = ServletUriComponentsBuilder.fromCurrentContextPath().path("/download/").path(filename).toUriString();
-        categoryModelJSON.setCategory_image(url);
-        categoriesRepository.save(categoryModelJSON);
+        categoriesRepository.save(categoryModel);
         List<CategoryModel> categoryModelList = new ArrayList<>();
-        categoryModelList.add(categoryModelJSON);
+        categoryModelList.add(categoryModel);
         response.setResponseWrapper(categoryModelList);
         response.setResponseDesc(Contants.SUCCESS);
         response.setResponseCode(Contants.OK_200);

@@ -16,7 +16,7 @@ public interface adminLogic {
 
      Response<ProductModel> updateProduct(ProductModel productModel,Integer pid);
 
-     Response<ProductModel> getproductJSON(String ProductModel,MultipartFile[] files,String catid) throws JsonProcessingException;
+     Response<ProductModel> getproductJSON(ProductModel ProductModel) throws JsonProcessingException;
 
      Response<String> deleteproduct(Integer pid);
 
@@ -28,7 +28,7 @@ public interface adminLogic {
 
      Response<String> deleteSizeFromProduct(Integer product_id, Integer sizeoption_id);
 
-     Response<CategoryModel> addCategory(String categoryModel, MultipartFile file);
+     Response<CategoryModel> addCategory(CategoryModel categoryModel);
 
      Response<String> deleteCategory(Integer cat_id);
 

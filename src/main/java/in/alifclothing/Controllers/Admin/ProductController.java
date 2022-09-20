@@ -68,9 +68,9 @@ public class ProductController {
     }
 
     @PostMapping("/product")
-    public ResponseEntity<Response<ProductModel>> addproduct(@RequestPart("product") String ProductModel,@RequestPart("files") MultipartFile[] files,@RequestPart("category") String catid) throws JsonProcessingException {
+    public ResponseEntity<Response<ProductModel>> addproduct(@RequestBody ProductModel productModel) throws JsonProcessingException {
 
-        Response<ProductModel> response = adminLogic.getproductJSON(ProductModel,files,catid);
+        Response<ProductModel> response = adminLogic.getproductJSON(productModel);
         if(response.getErrorMap() == null){
             return new ResponseEntity<Response<ProductModel>>(response, HttpStatus.OK);
         }
