@@ -75,9 +75,10 @@ public class securityConfiguration extends WebSecurityConfigurerAdapter {
                 .authorizeRequests().
                 antMatchers("/superuser/**").hasRole("SUPERUSER").
                 antMatchers("/admin/**").hasRole("ADMIN").
-//        antMatchers("/admin/**").permitAll().
                 antMatchers("/user/**").hasRole("USER").
-                antMatchers("/**").permitAll();
+                antMatchers("/**").permitAll()
+                .and().oauth2ResourceServer().jwt()
+                ;
     }
 
 }

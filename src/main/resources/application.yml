@@ -1,3 +1,17 @@
 file:
   storage:
     location: fileStorage
+
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 336893965232-ulr3k1akgpjtujpsj5heq56g5rgiafed.apps.googleusercontent.com
+            client-secret: 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
+            scope: profile,email
+      resourceserver:
+        jwt:
+          issuer-uri: https://accounts.google.com
+          jwk-set-uri: https://www.googleapis.com/oauth2/v3/certs
