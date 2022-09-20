@@ -77,7 +77,7 @@ public class securityConfiguration extends WebSecurityConfigurerAdapter {
                 antMatchers("/admin/**").hasRole("ADMIN").
                 antMatchers("/user/**").hasRole("USER").
                 antMatchers("/**").permitAll()
-                .and().oauth2ResourceServer().jwt()
+//                .and().oauth2ResourceServer().jwt()
                 ;
     }
 
