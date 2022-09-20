@@ -675,6 +675,21 @@ public class adminLogicImplementation implements adminLogic{
     }
 
     @Override
+    public Response<OrderModel> addOrder(OrderModel orderModel) {
+        Response<OrderModel> response = new Response<>();
+        Map<String,String> errorMap = new HashMap<>();
+
+        List<OrderModel> orderModelList = new ArrayList<>();
+        orderModelList.add(orderModel);
+        response.setResponseWrapper(orderModelList);
+        response.setResponseDesc(Contants.SUCCESS);
+        response.setResponseCode(Contants.OK_200);
+
+        orderRepository.save(orderModel);
+        return response;
+    }
+
+    @Override
     public Response<String> deleteUsersOrderByOrderId(Integer order_id) {
         boolean ifExists = orderRepository.existsById(order_id);
         Response<String> response = new Response<>();

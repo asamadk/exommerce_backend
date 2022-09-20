@@ -31,6 +31,16 @@ public class OrderController {
         return new ResponseEntity<Response<OrderModel>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @PostMapping("/order")
+    public ResponseEntity<Response<OrderModel>> addOrder(@RequestBody OrderModel orderModel){
+        Response<OrderModel> response = adminLogic.addOrder(orderModel);
+        if(response.getErrorMap() == null){
+            return new ResponseEntity<Response<OrderModel>>(response, HttpStatus.OK);
+        }
+
+        return new ResponseEntity<Response<OrderModel>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     @GetMapping("/order")
     public ResponseEntity<Response<OrderModel>> getUsersOrders(){
 

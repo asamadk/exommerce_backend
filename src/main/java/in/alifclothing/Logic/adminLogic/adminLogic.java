@@ -58,6 +58,8 @@ public interface adminLogic {
 
      Response<OrderModel> getUsersOrdersByUserId(String email);
 
+    Response<OrderModel> addOrder(OrderModel orderModel);
+
      Response<String> deleteUsersOrderByOrderId(Integer order_id);
 
      Response<String> updateOrdersStatusOfOneOrder(Integer order_id, Integer orderstatus_id);
