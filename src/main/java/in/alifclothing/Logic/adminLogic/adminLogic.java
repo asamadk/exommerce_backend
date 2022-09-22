@@ -16,7 +16,7 @@ public interface adminLogic {
 
      Response<ProductModel> updateProduct(ProductModel productModel,Integer pid);
 
-     Response<ProductModel> getproductJSON(ProductModel ProductModel) throws JsonProcessingException;
+     Response<ProductModel> getproductJSON(ProductModel ProductModel, String categoryId) throws JsonProcessingException;
 
      Response<String> deleteproduct(Integer pid);
 
@@ -42,7 +42,7 @@ public interface adminLogic {
 
      Response<String> deleteCoupon(Integer cid);
 
-     Response<String> addBanner(MultipartFile[] files,MultipartFile file1,MultipartFile file2,MultipartFile file3);
+     Response<String> addBanner(BannerModel bannerModel);
 
      Response<BannerModel> getBanners();
 
@@ -58,7 +58,7 @@ public interface adminLogic {
 
      Response<OrderModel> getUsersOrdersByUserId(String email);
 
-    Response<OrderModel> addOrder(OrderModel orderModel);
+    Response<OrderModel> addOrder(OrderModel orderModel, String userId);
 
      Response<String> deleteUsersOrderByOrderId(Integer order_id);
 

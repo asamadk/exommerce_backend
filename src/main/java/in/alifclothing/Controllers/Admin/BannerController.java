@@ -20,12 +20,9 @@ public class BannerController {
     private adminLogic adminLogic;
 
     @PostMapping("/banner")
-    public ResponseEntity<Response<String>> addbanner(@RequestPart("MainBanner") MultipartFile[] files,
-                                                     @RequestPart("Banner1") MultipartFile file1,
-                                                     @RequestPart("Banner2") MultipartFile file2,
-                                                     @RequestPart("Banner3") MultipartFile file3){
+    public ResponseEntity<Response<String>> addbanner(@RequestBody BannerModel bannerModel){
 
-        Response<String> response = adminLogic.addBanner(files,file1,file2,file3);
+        Response<String> response = adminLogic.addBanner(bannerModel);
         if(response.getErrorMap() == null){
             return new ResponseEntity<Response<String>>(response, HttpStatus.OK);
         }

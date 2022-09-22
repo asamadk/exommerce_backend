@@ -32,8 +32,11 @@ public class OrderController {
     }
 
     @PostMapping("/order")
-    public ResponseEntity<Response<OrderModel>> addOrder(@RequestBody OrderModel orderModel){
-        Response<OrderModel> response = adminLogic.addOrder(orderModel);
+    public ResponseEntity<Response<OrderModel>> addOrder(
+            @RequestBody OrderModel orderModel,
+            @RequestParam("userId") String userId
+    ){
+        Response<OrderModel> response = adminLogic.addOrder(orderModel, userId);
         if(response.getErrorMap() == null){
             return new ResponseEntity<Response<OrderModel>>(response, HttpStatus.OK);
         }

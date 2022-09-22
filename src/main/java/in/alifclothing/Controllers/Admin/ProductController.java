@@ -68,9 +68,12 @@ public class ProductController {
     }
 
     @PostMapping("/product")
-    public ResponseEntity<Response<ProductModel>> addproduct(@RequestBody ProductModel productModel) throws JsonProcessingException {
+    public ResponseEntity<Response<ProductModel>> addProduct(
+            @RequestBody ProductModel productModel,
+            @RequestParam("catId") String categoryId
+    ) throws JsonProcessingException {
 
-        Response<ProductModel> response = adminLogic.getproductJSON(productModel);
+        Response<ProductModel> response = adminLogic.getproductJSON(productModel, categoryId);
         if(response.getErrorMap() == null){
             return new ResponseEntity<Response<ProductModel>>(response, HttpStatus.OK);
         }
@@ -79,8 +82,8 @@ public class ProductController {
     }
 
 
-    @DeleteMapping("/product")
-    public ResponseEntity<Response<String>> deleteproduct(@RequestParam("product_id") String pid){
+    @DeleteMapping("/product/{product_id}")
+    public ResponseEntity<Response<String>> deleteProduct(@PathVariable("product_id") String pid){
 
         Response<String> response = adminLogic.deleteproduct(Integer.parseInt(pid));
         if(response.getErrorMap() == null){

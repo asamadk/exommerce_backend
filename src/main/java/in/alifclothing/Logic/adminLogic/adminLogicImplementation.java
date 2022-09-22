@@ -122,7 +122,7 @@ public class adminLogicImplementation implements adminLogic{
     }
 
     @Override
-    public Response<ProductModel> getproductJSON(ProductModel productModel) throws JsonProcessingException {
+    public Response<ProductModel> getproductJSON(ProductModel productModel, String categoryID) throws JsonProcessingException {
         Response<ProductModel> response = new Response<>();
         Map<String,String> errorMap = new HashMap<>();
 
@@ -130,18 +130,18 @@ public class adminLogicImplementation implements adminLogic{
         productModel.setUpdateDate(new Date(millis));
         productModel.setAvaialable(true);
 
-//        Optional<CategoryModel> categoryModel = categoriesRepository.findById(Integer.parseInt(productModel.cate));
+        Optional<CategoryModel> categoryModel = categoriesRepository.findById(Integer.parseInt(categoryID));
 
-//        if(categoryModel.isPresent()){
-//            CategoryModel c = categoryModel.get();
-//            productJSON.setCategoryModel(c);
-//        }else{
-//            response.setResponseCode(Contants.NOT_FOUND_404);
-//            errorMap.put(Contants.ERROR,"No category found");
-//            response.setErrorMap(errorMap);
-//            response.setResponseDesc(Contants.FALIURE);
-//            return response;
-//        }
+        if(categoryModel.isPresent()){
+            CategoryModel category = categoryModel.get();
+            productModel.setCategoryModel(category);
+        }else{
+            response.setResponseCode(Contants.NOT_FOUND_404);
+            errorMap.put(Contants.ERROR,"No category found");
+            response.setErrorMap(errorMap);
+            response.setResponseDesc(Contants.FALIURE);
+            return response;
+        }
 
         productRepository.save(productModel);
         List<ProductModel> productModelList = new ArrayList<>();
@@ -319,25 +319,18 @@ public class adminLogicImplementation implements adminLogic{
         Map<String,String> errorMap = new HashMap<>();
 
             Optional<CategoryModel> categoryModel =  categoriesRepository.findById(cat_id);
-            categoryModel.ifPresent(category -> {
-                int i = category.getCategory_image().length()-1;
-                while(i >= 0){
-                    if(category.getCategory_image().charAt(i) == '/')break;
-                    i--;
-                }
-                fileStorageService.deleteFile(category.getCategory_image().substring(i+1));
-                categoriesRepository.delete(category);
-                response.setResponseWrapper(Arrays.asList("Category Deleted"));
+            if(categoryModel.isPresent()){
+                categoriesRepository.delete(categoryModel.get());
+                response.setResponseWrapper(Collections.singletonList("Category Deleted"));
                 response.setResponseDesc(Contants.SUCCESS);
                 response.setResponseCode(Contants.OK_200);
-            });
-
-            if(!categoryModel.isPresent()){
+            }else{
                 response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
                 errorMap.put(Contants.ERROR,"No category found");
                 response.setErrorMap(errorMap);
                 response.setResponseDesc(Contants.FALIURE);
             }
+
         return response;
     }
 
@@ -443,45 +436,16 @@ public class adminLogicImplementation implements adminLogic{
     }
 
     @Override
-    public Response<String > addBanner(MultipartFile[] files,MultipartFile file5,MultipartFile file6, MultipartFile file7) {
+    public Response<String > addBanner(BannerModel bannerModel) {
 
+        deleteAllBanners();
         Response<String> response = new Response<>();
         Map<String,String> errorMap = new HashMap<>();
 
-        if(!bannerRepository.findAll().isEmpty()){
-            response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
-            errorMap.put(Contants.ERROR,"Please delete all banners first");
-            response.setErrorMap(errorMap);
-            response.setResponseDesc(Contants.FALIURE);
-        }
-
-        List<String> bannerModelList = new ArrayList<>();
-
-        Arrays.stream(files).forEach(file -> {
-            String filename = fileStorageService.storeFile(file);
-            String url = ServletUriComponentsBuilder.fromCurrentContextPath().path("/download/").path(filename).toUriString();
-            bannerModelList.add(url);
-        });
-        String fileName5 = fileStorageService.storeFile(file5);
-        String url5 = ServletUriComponentsBuilder.fromCurrentContextPath().path("/download/").path(fileName5).toUriString();
-        String fileName6 = fileStorageService.storeFile(file6);
-        String url6 = ServletUriComponentsBuilder.fromCurrentContextPath().path("/download/").path(fileName6).toUriString();
-        String fileName7 = fileStorageService.storeFile(file7);
-        String url7 = ServletUriComponentsBuilder.fromCurrentContextPath().path("/download/").path(fileName7).toUriString();
-
-        BannerModel bannerModel = new BannerModel();
-
-            bannerModel.setBannerimg1(bannerModelList.get(0));
-            bannerModel.setBannerimg2(bannerModelList.get(1));
-            bannerModel.setBannerimg3(bannerModelList.get(2));
-            bannerModel.setBannerimg4(bannerModelList.get(3));
-            bannerModel.setBannerimg5(url5);
-            bannerModel.setBannerimg6(url6);
-            bannerModel.setBannerimg7(url7);
-            bannerRepository.save(bannerModel);
-            response.setResponseWrapper(Arrays.asList("Banners added"));
-            response.setResponseDesc(Contants.SUCCESS);
-            response.setResponseCode(Contants.OK_200);
+        bannerRepository.save(bannerModel);
+        response.setResponseWrapper(Arrays.asList("Banners added"));
+        response.setResponseDesc(Contants.SUCCESS);
+        response.setResponseCode(Contants.OK_200);
 
         return response;
     }
@@ -646,9 +610,21 @@ public class adminLogicImplementation implements adminLogic{
     }
 
     @Override
-    public Response<OrderModel> addOrder(OrderModel orderModel) {
+    public Response<OrderModel> addOrder(OrderModel orderModel, String userId) {
         Response<OrderModel> response = new Response<>();
         Map<String,String> errorMap = new HashMap<>();
+
+        Optional<UserModel> userModelOptional = userRepository.findById(Integer.parseInt(userId));
+
+        if(userModelOptional.isPresent()){
+            orderModel.setUserModel(userModelOptional.get());
+        }else{
+            response.setResponseCode(Contants.NOT_FOUND_404);
+            errorMap.put(Contants.ERROR,"No user found");
+            response.setErrorMap(errorMap);
+            response.setResponseDesc(Contants.FALIURE);
+            return response;
+        }
 
         List<OrderModel> orderModelList = new ArrayList<>();
         orderModelList.add(orderModel);
