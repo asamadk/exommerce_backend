@@ -138,9 +138,9 @@ public class ProductController {
     }
 
     //extract file name from front end to delete specific file
-    @DeleteMapping("/product/{file_name}")
-    public void deleteProductImages(@PathVariable("file_name") String file_name){
-        fileStorageService.deleteFile(file_name);
-    }
+//    @DeleteMapping("/product/{file_name}")
+//    public void deleteProductImages(@PathVariable("file_name") String file_name){
+//        fileStorageService.deleteFile(file_name);
+//    }
 
 }

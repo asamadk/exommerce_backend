@@ -43,6 +43,8 @@ public class adminLogicImplementation implements adminLogic{
     private DeleteProductImages dpi;
     @Autowired
     private DeleteBannerImages dbi;
+    @Autowired
+    private UserProductInfoRepository userProductInfoRepository;
 
     public adminLogicImplementation(fileStorageService fileStorageService){
         this.fileStorageService = fileStorageService;
@@ -458,7 +460,7 @@ public class adminLogicImplementation implements adminLogic{
         List<BannerModel> bannerModelList = bannerRepository.findAll();
         if(bannerModelList.size() == 0){
             response.setResponseCode(Contants.INTERNAL_SERVER_ERROR);
-            errorMap.put(Contants.ERROR,"No product found in wishlist");
+            errorMap.put(Contants.ERROR,"No banners found in wishlist");
             response.setErrorMap(errorMap);
             response.setResponseDesc(Contants.FALIURE);
         }else {
@@ -639,6 +641,7 @@ public class adminLogicImplementation implements adminLogic{
     @Override
     public Response<String> deleteUsersOrderByOrderId(Integer order_id) {
         boolean ifExists = orderRepository.existsById(order_id);
+
         Response<String> response = new Response<>();
         Map<String,String> errorMap = new HashMap<>();
 

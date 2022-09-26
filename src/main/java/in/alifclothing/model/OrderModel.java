@@ -31,7 +31,7 @@ public class OrderModel {
     private Boolean isPaid;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "orderModel")
+    @OneToMany(mappedBy = "orderModel" ,cascade = CascadeType.ALL)
     private List<UserProductInformation> userProductInformations;
 
     public OrderModel(UserModel userModel, List<ProductModel> productModelList,

@@ -61,7 +61,6 @@ public class UserAdminController {
         if(response.getErrorMap() == null){
             return new ResponseEntity<Response<String>>(response, HttpStatus.OK);
         }
-
         return new ResponseEntity<Response<String>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

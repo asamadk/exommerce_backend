@@ -122,6 +122,16 @@ public class homeController {
 
         return new ResponseEntity<Response<ProductModel>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
     }
+    @GetMapping("/banner")
+    public ResponseEntity<Response<BannerModel>> getBanners(){
+
+        Response<BannerModel> response = adminLogic.getBanners();
+        if(response.getErrorMap() == null){
+            return new ResponseEntity<Response<BannerModel>>(response, HttpStatus.OK);
+        }
+
+        return new ResponseEntity<Response<BannerModel>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
     @GetMapping("/product/category/{category_id}")
     public ResponseEntity<Response<ProductModel>> fetchProductsByCategories(@PathVariable("category_id") Integer category_id,
